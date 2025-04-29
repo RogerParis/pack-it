@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "280001888915",
+    "project_id": "packit-f6516",
+    "storage_bucket": "packit-f6516.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:280001888915:android:f9083724e098cfd08cc366",
+        "android_client_info": {
+          "package_name": "com.rogerparis.packit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGK5ABXM_CgrTHKaWuJbzM_SG2NgELwyI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

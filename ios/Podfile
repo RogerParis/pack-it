@@ -8,7 +8,6 @@ ENV['RCT_NEW_ARCH_ENABLED'] = podfile_properties['newArchEnabled'] == 'true' ? '
 ENV['EX_DEV_CLIENT_NETWORK_INSPECTOR'] = podfile_properties['EX_DEV_CLIENT_NETWORK_INSPECTOR']
 
 platform :ios, podfile_properties['ios.deploymentTarget'] || '15.1'
-
 install! 'cocoapods',
   :deterministic_uuids => false
 
@@ -18,7 +17,7 @@ target 'packit' do
   use_expo_modules!
 
   if ENV['EXPO_USE_COMMUNITY_AUTOLINKING'] == '1'
-    config_command = ['node', '-e', "process.argv=['', '', 'config'];require('@react-native-community/cli').run()"]
+    config_command = ['node', '-e', "process.argv=['', '', 'config'];require('@react-native-community/cli').run()"];
   else
     config_command = [
       'node',
@@ -34,36 +33,16 @@ target 'packit' do
 
   config = use_native_modules!(config_command)
 
-  # ⚡ KEY PART: Use dynamic frameworks
-  use_frameworks!
+  use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
+  use_frameworks! :linkage => ENV['USE_FRAMEWORKS'].to_sym if ENV['USE_FRAMEWORKS']
 
   use_react_native!(
     :path => config[:reactNativePath],
     :hermes_enabled => podfile_properties['expo.jsEngine'] == nil || podfile_properties['expo.jsEngine'] == 'hermes',
+    # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/..",
     :privacy_file_aggregation_enabled => podfile_properties['apple.privacyManifestAggregationEnabled'] != 'false',
   )
-
-  # 📦 Selective modular headers for Firebase & gRPC
-  pod 'FirebaseAuth', :modular_headers => true
-  pod 'FirebaseAuthInterop', :modular_headers => true
-  pod 'FirebaseFirestore', :modular_headers => true
-  pod 'FirebaseFirestoreInternal', :modular_headers => true
-  pod 'FirebaseCore', :modular_headers => true
-  pod 'FirebaseCoreInternal', :modular_headers => true
-  pod 'FirebaseCoreExtension', :modular_headers => true
-  pod 'FirebaseCrashlytics', :modular_headers => true
-  pod 'FirebaseInstallations', :modular_headers => true
-  pod 'FirebaseAppCheckInterop', :modular_headers => true
-  pod 'RecaptchaInterop', :modular_headers => true
-  pod 'GoogleUtilities', :modular_headers => true
-  pod 'GoogleDataTransport', :modular_headers => true
-  pod 'nanopb', :modular_headers => true
-  pod 'gRPC-Core', :modular_headers => true
-  pod 'gRPC-C++', :modular_headers => true
-  pod 'gRPC', :modular_headers => true
-  pod 'gRPC-ProtoRPC', :modular_headers => true
-  pod 'gRPC-RxLibrary', :modular_headers => true
 
   post_install do |installer|
     react_native_post_install(
@@ -72,33 +51,14 @@ target 'packit' do
       :mac_catalyst_enabled => false,
       :ccache_enabled => podfile_properties['apple.ccacheEnabled'] == 'true',
     )
-  
-    # Fix resource signing
-    installer.target_installation_results.pod_target_installation_results.each do |pod_name, target_installation_result|
+
+    # This is necessary for Xcode 14, because it signs resource bundles by default
+    # when building for devices.
+    installer.target_installation_results.pod_target_installation_results
+      .each do |pod_name, target_installation_result|
       target_installation_result.resource_bundle_targets.each do |resource_bundle_target|
         resource_bundle_target.build_configurations.each do |config|
           config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
-        end
-      end
-    end
-  
-    # 🚀 MMKV - Link zlib manually
-    installer.pods_project.targets.each do |target|
-      if target.name == 'react-native-mmkv'
-        target.build_configurations.each do |config|
-          config.build_settings['OTHER_LDFLAGS'] = "#{config.build_settings['OTHER_LDFLAGS']} -lz"
-        end
-      end
-    
-      target.build_configurations.each do |config|
-        config.build_settings['OTHER_SWIFT_FLAGS'] ||= ['$(inherited)', '-enable-experimental-feature', 'AccessLevelOnImport']
-      end
-    end
-  
-    installer.aggregate_targets.each do |aggregate_target|
-      aggregate_target.user_project.targets.each do |target|
-        target.build_configurations.each do |config|
-          config.build_settings['OTHER_SWIFT_FLAGS'] ||= ['$(inherited)', '-enable-experimental-feature', 'AccessLevelOnImport']
         end
       end
     end
