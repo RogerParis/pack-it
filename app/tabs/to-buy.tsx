@@ -1,21 +1,15 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  FlatList,
-  StyleSheet,
-} from "react-native";
-import { usePackingStore } from "../../store/packingStore";
+import React, { useState } from 'react';
+import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 
-import { PackingItem } from "../../types/packing";
-import { v4 as uuid } from "uuid";
+import { usePackingStore } from '../../store/packingStore';
+import { PackingItem } from '../../types/packing';
+
+import { v4 as uuid } from 'uuid';
 
 export default function ToBuyScreen() {
-  const [itemName, setItemName] = useState("");
-  const { toBuy, addItem, moveToPack } = usePackingStore();
+  const [itemName, setItemName] = useState('');
+  const { toBuy, addItem } = usePackingStore();
 
   const handleAdd = () => {
     if (!itemName.trim()) return;
@@ -24,8 +18,8 @@ export default function ToBuyScreen() {
       name: itemName.trim(),
       packed: false,
     };
-    addItem("toBuy", newItem);
-    setItemName("");
+    addItem('toBuy', newItem);
+    setItemName('');
   };
 
   const renderItem = ({ item }: { item: PackingItem }) => {
@@ -36,9 +30,7 @@ export default function ToBuyScreen() {
     );
 
     return (
-      <Swipeable
-        renderRightActions={renderRightActions}
-      >
+      <Swipeable renderRightActions={renderRightActions}>
         <View style={styles.item}>
           <Text style={styles.itemText}>{item.name}</Text>
         </View>
@@ -69,28 +61,28 @@ export default function ToBuyScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
-  inputRow: { flexDirection: "row", marginBottom: 16, gap: 8 },
+  inputRow: { flexDirection: 'row', marginBottom: 16, gap: 8 },
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     padding: 8,
     borderRadius: 6,
   },
   list: { gap: 12 },
   item: {
     padding: 14,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: '#f0f0f0',
     borderRadius: 8,
   },
   itemText: { fontSize: 16 },
   swipeRight: {
-    backgroundColor: "#d4fcd4",
-    justifyContent: "center",
-    alignItems: "flex-end",
+    backgroundColor: '#d4fcd4',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
     paddingHorizontal: 20,
     flex: 1,
     borderRadius: 8,
   },
-  swipeText: { fontWeight: "bold", color: "#008000" },
+  swipeText: { fontWeight: 'bold', color: '#008000' },
 });

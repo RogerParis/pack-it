@@ -4,4 +4,4 @@ export type PackingItem = {
   packed: boolean;
 };
 
-export type ListType = "toBuy" | "toPack" | "suggestions";
+export type ListType = 'toBuy' | 'toPack' | 'suggestions';

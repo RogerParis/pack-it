@@ -1,8 +1,10 @@
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-import { MMKV } from "react-native-mmkv";
-import { PackingItem } from "../types/packing";
-import { immer } from "zustand/middleware/immer";
+import { MMKV } from 'react-native-mmkv';
+
+import { PackingItem } from '../types/packing';
+
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
 
 const storage = new MMKV();
 
@@ -18,7 +20,7 @@ type PackingState = {
 
 export const usePackingStore = create<PackingState>()(
   persist(
-    immer((set, get) => ({
+    immer((set) => ({
       toBuy: [],
       toPack: [],
       suggestions: [],
@@ -49,12 +51,12 @@ export const usePackingStore = create<PackingState>()(
       },
     })),
     {
-      name: "packing-storage",
+      name: 'packing-storage',
       storage: createJSONStorage(() => ({
         getItem: (key) => storage.getString(key) ?? null,
         setItem: storage.set.bind(storage),
         removeItem: storage.delete.bind(storage),
       })),
-    }
-  )
+    },
+  ),
 );
