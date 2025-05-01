@@ -48,7 +48,6 @@ export default function ToBuyScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>🛒 To Buy</Text>
       <View style={styles.inputRow}>
         <TextInput
           value={itemName}
@@ -70,7 +69,6 @@ export default function ToBuyScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
-  heading: { fontSize: 22, fontWeight: "bold", marginBottom: 12 },
   inputRow: { flexDirection: "row", marginBottom: 16, gap: 8 },
   input: {
     flex: 1,
