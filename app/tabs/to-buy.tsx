@@ -5,6 +5,7 @@ import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { usePackingStore } from '../../store/packingStore';
 import { PackingItem } from '../../types/packing';
 
+import { COLORS } from '@/theme/colors';
 import { v4 as uuid } from 'uuid';
 
 export default function ToBuyScreen() {
@@ -65,24 +66,24 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: COLORS.border,
     padding: 8,
     borderRadius: 6,
   },
   list: { gap: 12 },
   item: {
     padding: 14,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: COLORS.background,
     borderRadius: 8,
   },
   itemText: { fontSize: 16 },
   swipeRight: {
-    backgroundColor: '#d4fcd4',
+    backgroundColor: COLORS.secondary,
     justifyContent: 'center',
     alignItems: 'flex-end',
     paddingHorizontal: 20,
     flex: 1,
     borderRadius: 8,
   },
-  swipeText: { fontWeight: 'bold', color: '#008000' },
+  swipeText: { fontWeight: 'bold', color: COLORS.secondary },
 });

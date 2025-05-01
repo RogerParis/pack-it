@@ -4,6 +4,8 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { usePackingStore } from '../../store/packingStore';
 import { PackingItem } from '../../types/packing';
 
+import { COLORS } from '@/theme/colors';
+
 export default function ToPackScreen() {
   const { toPack, togglePacked } = usePackingStore();
 
@@ -33,12 +35,12 @@ const styles = StyleSheet.create({
   list: { gap: 12 },
   item: {
     padding: 14,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: COLORS.background,
     borderRadius: 8,
   },
   itemText: { fontSize: 16 },
   packedText: {
     textDecorationLine: 'line-through',
-    color: '#999',
+    color: COLORS.text,
   },
 });
