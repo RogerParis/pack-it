@@ -24,7 +24,7 @@ export default function ToBuyScreen() {
   };
 
   const renderItem = ({ item }: { item: PackingItem }) => (
-    <PackingListItem item={item} onSwipeRight={() => moveToPack(item.id)} />
+    <PackingListItem item={item} onSwipeLeft={() => moveToPack(item.id)} />
   );
 
   return (

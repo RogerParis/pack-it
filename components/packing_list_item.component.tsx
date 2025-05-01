@@ -7,11 +7,11 @@ import { PackingItem } from '../types/packing';
 
 type Props = {
   item: PackingItem;
-  onSwipeRight?: () => void;
+  onSwipeLeft?: () => void;
   onPress?: () => void;
 };
 
-export default function PackingListItem({ item, onSwipeRight, onPress }: Props) {
+export default function PackingListItem({ item, onSwipeLeft, onPress }: Props) {
   const renderRightActions = () => (
     <View style={styles.swipeRight}>
       <Text style={styles.swipeText}>→ To Pack</Text>
@@ -20,10 +20,10 @@ export default function PackingListItem({ item, onSwipeRight, onPress }: Props) 
 
   return (
     <Swipeable
-      renderRightActions={onSwipeRight ? renderRightActions : undefined}
+      renderRightActions={onSwipeLeft ? renderRightActions : undefined}
       onSwipeableOpen={(direction) => {
-        if (direction === 'right') {
-          onSwipeRight?.();
+        if (direction === 'left') {
+          onSwipeLeft?.();
         }
       }}>
       <Pressable onPress={onPress}>
