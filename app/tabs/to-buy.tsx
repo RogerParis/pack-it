@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Button, FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
-import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import { Button, FlatList, StyleSheet, TextInput, View } from 'react-native';
 
-import { usePackingStore } from '../../store/packingStore';
-import { PackingItem } from '../../types/packing';
+import PackingListItem from '@/components/packing_list_item.component';
 
+import { usePackingStore } from '@/store/packingStore';
 import { COLORS } from '@/theme/colors';
+import { PackingItem } from '@/types/packing';
 import { v4 as uuid } from 'uuid';
 
 export default function ToBuyScreen() {
   const [itemName, setItemName] = useState('');
-  const { toBuy, addItem } = usePackingStore();
+  const { toBuy, addItem, moveToPack } = usePackingStore();
 
   const handleAdd = () => {
     if (!itemName.trim()) return;
@@ -23,21 +23,9 @@ export default function ToBuyScreen() {
     setItemName('');
   };
 
-  const renderItem = ({ item }: { item: PackingItem }) => {
-    const renderRightActions = () => (
-      <View style={styles.swipeRight}>
-        <Text style={styles.swipeText}>→ To Pack</Text>
-      </View>
-    );
-
-    return (
-      <Swipeable renderRightActions={renderRightActions}>
-        <View style={styles.item}>
-          <Text style={styles.itemText}>{item.name}</Text>
-        </View>
-      </Swipeable>
-    );
-  };
+  const renderItem = ({ item }: { item: PackingItem }) => (
+    <PackingListItem item={item} onSwipeRight={() => moveToPack(item.id)} />
+  );
 
   return (
     <View style={styles.container}>

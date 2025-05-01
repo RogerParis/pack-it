@@ -1,20 +1,17 @@
 import React from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 
-import { usePackingStore } from '../../store/packingStore';
-import { PackingItem } from '../../types/packing';
+import PackingListItem from '@/components/packing_list_item.component';
 
+import { usePackingStore } from '@/store/packingStore';
 import { COLORS } from '@/theme/colors';
+import { PackingItem } from '@/types/packing';
 
 export default function ToPackScreen() {
   const { toPack, togglePacked } = usePackingStore();
 
   const renderItem = ({ item }: { item: PackingItem }) => (
-    <Pressable onPress={() => togglePacked(item.id)}>
-      <View style={styles.item}>
-        <Text style={[styles.itemText, item.packed && styles.packedText]}>{item.name}</Text>
-      </View>
-    </Pressable>
+    <PackingListItem item={item} onPress={() => togglePacked(item.id)} />
   );
 
   return (
