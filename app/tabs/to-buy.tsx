@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useState } from 'react';
 import { Button, FlatList, StyleSheet, TextInput, View } from 'react-native';
 
 import PackingListItem from '@/components/packing_list_item.component';
 
-import { usePackingStore } from '@/store/packingStore';
+import { usePackingStore } from '../../store/packingStore';
+import { PackingItem } from '../../types/packing';
+
 import { COLORS } from '@/theme/colors';
-import { PackingItem } from '@/types/packing';
 import { v4 as uuid } from 'uuid';
 
 export default function ToBuyScreen() {
   const [itemName, setItemName] = useState('');
-  const { toBuy, addItem, moveToPack } = usePackingStore();
+  const { toBuy, addItem, removeItem, moveToPack } = usePackingStore();
 
   const handleAdd = () => {
     if (!itemName.trim()) return;
@@ -24,7 +26,11 @@ export default function ToBuyScreen() {
   };
 
   const renderItem = ({ item }: { item: PackingItem }) => (
-    <PackingListItem item={item} onSwipeLeft={() => moveToPack(item.id)} />
+    <PackingListItem
+      item={item}
+      onDelete={() => removeItem('toBuy', item.id)}
+      onMoveToPack={() => moveToPack(item.id)}
+    />
   );
 
   return (
@@ -50,6 +56,7 @@ export default function ToBuyScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
+  heading: { fontSize: 22, fontWeight: 'bold', marginBottom: 12 },
   inputRow: { flexDirection: 'row', marginBottom: 16, gap: 8 },
   input: {
     flex: 1,
@@ -59,19 +66,4 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   list: { gap: 12 },
-  item: {
-    padding: 14,
-    backgroundColor: COLORS.background,
-    borderRadius: 8,
-  },
-  itemText: { fontSize: 16 },
-  swipeRight: {
-    backgroundColor: COLORS.secondary,
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    paddingHorizontal: 20,
-    flex: 1,
-    borderRadius: 8,
-  },
-  swipeText: { fontWeight: 'bold', color: COLORS.secondary },
 });

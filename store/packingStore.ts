@@ -8,14 +8,17 @@ import { immer } from 'zustand/middleware/immer';
 
 const storage = new MMKV();
 
+type ListKey = 'toBuy' | 'toPack' | 'suggestions';
+
 type PackingState = {
   toBuy: PackingItem[];
   toPack: PackingItem[];
   suggestions: PackingItem[];
 
-  addItem: (list: keyof PackingState, item: PackingItem) => void;
+  addItem: (list: ListKey, item: PackingItem) => void;
   togglePacked: (id: string) => void;
   moveToPack: (id: string) => void;
+  removeItem: (list: ListKey, id: string) => void;
 };
 
 export const usePackingStore = create<PackingState>()(
@@ -47,6 +50,12 @@ export const usePackingStore = create<PackingState>()(
             const [item] = state.toBuy.splice(index, 1);
             state.toPack.push({ ...item, packed: false });
           }
+        });
+      },
+
+      removeItem: (list, id) => {
+        set((state) => {
+          state[list] = state[list].filter((item) => item.id !== id);
         });
       },
     })),

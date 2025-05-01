@@ -1,31 +1,51 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+
+import { Ionicons } from '@expo/vector-icons';
 
 import { COLORS } from '../theme/colors';
 import { PackingItem } from '../types/packing';
 
 type Props = {
   item: PackingItem;
-  onSwipeLeft?: () => void;
+  onDelete?: () => void;
+  onMoveToPack?: () => void;
   onPress?: () => void;
 };
 
-export default function PackingListItem({ item, onSwipeLeft, onPress }: Props) {
+export default function PackingListItem({ item, onDelete, onMoveToPack, onPress }: Props) {
   const renderRightActions = () => (
-    <View style={styles.swipeRight}>
-      <Text style={styles.swipeText}>→ To Pack</Text>
+    <View style={styles.actionsContainer}>
+      {onMoveToPack && (
+        <Pressable
+          style={[styles.actionButton, { backgroundColor: COLORS.secondary }]}
+          onPress={onMoveToPack}>
+          <Ionicons name="briefcase-outline" size={24} color={COLORS.white} />
+        </Pressable>
+      )}
+      {onDelete && (
+        <Pressable
+          style={[styles.actionButton, { backgroundColor: COLORS.error }]}
+          onPress={() => {
+            Alert.alert(
+              'Delete Item',
+              'Are you sure you want to delete this item?',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Delete', style: 'destructive', onPress: onDelete },
+              ],
+              { cancelable: true },
+            );
+          }}>
+          <Ionicons name="trash-bin" size={24} color={COLORS.white} />
+        </Pressable>
+      )}
     </View>
   );
 
   return (
-    <Swipeable
-      renderRightActions={onSwipeLeft ? renderRightActions : undefined}
-      onSwipeableOpen={(direction) => {
-        if (direction === 'left') {
-          onSwipeLeft?.();
-        }
-      }}>
+    <Swipeable renderRightActions={renderRightActions}>
       <Pressable onPress={onPress}>
         <View style={styles.item}>
           <Text style={[styles.itemText, item.packed && styles.packedText]}>{item.name}</Text>
@@ -46,13 +66,15 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
     color: COLORS.neutral500,
   },
-  swipeRight: {
-    backgroundColor: COLORS.secondary,
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    paddingHorizontal: 20,
-    flex: 1,
-    borderRadius: 8,
+  actionsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  swipeText: { fontWeight: 'bold', color: COLORS.white },
+  actionButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 80,
+    borderRadius: 8,
+    marginLeft: 8,
+  },
 });
