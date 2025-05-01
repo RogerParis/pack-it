@@ -41,6 +41,6 @@ const styles = StyleSheet.create({
   itemText: { fontSize: 16 },
   packedText: {
     textDecorationLine: 'line-through',
-    color: COLORS.text,
+    color: COLORS.neutral500,
   },
 });

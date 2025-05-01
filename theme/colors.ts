@@ -1,14 +1,19 @@
-// constants/colors.ts
 export const COLORS = {
+  // Semantic colors
   primary: '#0A84FF',
   secondary: '#60a960',
+  error: '#FF3B30',
+
+  // Text and backgrounds
   text: '#1A1A1A',
   background: '#F9F9F9',
-  error: '#FF3B30',
-  border: '#E0E0E0',
-  icon: '#8E8E93',
 
-  //Simple Colors
-  red: '#FF3B30',
+  // Neutrals
+  neutral100: '#F9F9F9',
+  neutral300: '#E0E0E0',
+  neutral500: '#8E8E93',
+  neutral900: '#1A1A1A',
+
+  // Utility
   white: '#FFFFFF',
 };
