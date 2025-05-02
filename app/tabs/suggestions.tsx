@@ -14,6 +14,7 @@ import {
 import { usePackingStore } from '../../store/packingStore';
 import { COLORS } from '../../theme/colors';
 
+import { getWeatherForecast } from '@/services/weather.service';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function SuggestionsScreen() {
@@ -32,26 +33,36 @@ export default function SuggestionsScreen() {
 
   // const [generated, setGenerated] = useState<string[]>([]);
 
-  const handleGenerate = useCallback(() => {
-    if (!location || !startDate || !endDate) {
-      alert('Please enter destination and select both dates.');
-      return;
+  const handleGenerate = useCallback(async () => {
+    let weatherHint = 'No weather data available';
+
+    if (location) {
+      try {
+        const weatherData = await getWeatherForecast(location);
+        weatherHint = weatherData?.list?.[0]?.weather?.[0]?.description || 'No forecast';
+      } catch (error) {
+        console.warn('Failed to fetch weather data:', error);
+      }
     }
 
-    const duration =
-      Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))) + 1;
+    // Calculate duration if dates are provided
+    let duration = 3; // Default to 3 days if dates missing
+    if (startDate && endDate) {
+      duration =
+        Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))) +
+        1;
+    }
 
-    // Dummy suggestions (replace later with AI & weather-based)
+    // Dummy suggestions
     const newSuggestions = [
       'Sunscreen',
-      'Rain jacket',
-      'Hiking boots',
-      `Map of ${location}`,
-      `${activities.split(',')[0] || 'General'} gear`,
+      ...(location ? [`Map of ${location}`] : []),
+      ...(activities ? [`${activities.split(',')[0]} gear`] : ['General gear']),
       `${duration} days worth of clothing`,
+      `Weather hint: ${weatherHint}`,
     ];
 
-    clearList('suggestions');
+    clearList('suggestions'); // Clear previous suggestions
 
     newSuggestions.forEach((item) => {
       addItem('suggestions', {
