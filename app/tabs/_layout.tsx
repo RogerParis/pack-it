@@ -1,9 +1,23 @@
-import { Tabs } from 'expo-router';
+import { Pressable } from 'react-native';
+
+import { Tabs, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
+import { COLORS } from '@/theme/colors';
+
 export default function TabLayout() {
+  const router = useRouter();
+
   return (
-    <Tabs screenOptions={{ headerShown: true }}>
+    <Tabs
+      screenOptions={{
+        headerRight: () => (
+          <Pressable onPress={() => router.push('/profile')} style={{ marginRight: 16 }}>
+            <Ionicons name="person-circle-outline" size={28} color={COLORS.primary} />
+          </Pressable>
+        ),
+        headerShown: true,
+      }}>
       <Tabs.Screen
         name="to-pack"
         options={{
