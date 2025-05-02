@@ -30,7 +30,7 @@ export default function SuggestionsScreen() {
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
 
-  const [generated, setGenerated] = useState<string[]>([]);
+  // const [generated, setGenerated] = useState<string[]>([]);
 
   const handleGenerate = useCallback(() => {
     if (!location || !startDate || !endDate) {
@@ -61,7 +61,7 @@ export default function SuggestionsScreen() {
       });
     });
 
-    setGenerated(newSuggestions);
+    // setGenerated(newSuggestions);
   }, [location, startDate, endDate, activities, addItem]);
 
   const formatDate = (date: Date | null) => (date ? date.toLocaleDateString() : 'Select date');
@@ -89,7 +89,7 @@ export default function SuggestionsScreen() {
             value={startDate || new Date()}
             mode="date"
             display="default"
-            onChange={(event, date) => {
+            onChange={(_, date) => {
               setShowStartPicker(false);
               if (date) setStartDate(date);
             }}
@@ -105,7 +105,7 @@ export default function SuggestionsScreen() {
             value={endDate || new Date()}
             mode="date"
             display="default"
-            onChange={(event, date) => {
+            onChange={(_, date) => {
               setShowEndPicker(false);
               if (date) setEndDate(date);
             }}
