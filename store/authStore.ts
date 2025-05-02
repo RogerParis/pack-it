@@ -1,5 +1,7 @@
+import { usePackingStore } from './packingStore';
 import { login, logout, register } from '../services/auth.service';
 
+import { saveUserPackingData } from '@/services/cloud.service';
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
@@ -13,7 +15,7 @@ type AuthState = {
 };
 
 export const useAuthStore = create<AuthState>()(
-  immer((set) => ({
+  immer((set, get) => ({
     user: null,
 
     setUser: (uid) => {
@@ -39,6 +41,17 @@ export const useAuthStore = create<AuthState>()(
     },
 
     signOut: async () => {
+      const { user } = get();
+      const getCurrentState = usePackingStore((state) => state.getCurrentState);
+
+      const currentData = getCurrentState();
+      await saveUserPackingData(
+        user!,
+        currentData.toBuy,
+        currentData.toPack,
+        currentData.suggestions,
+      );
+
       await logout();
       set((state) => {
         state.user = null;

@@ -19,11 +19,22 @@ type PackingState = {
   togglePacked: (id: string) => void;
   moveToPack: (id: string) => void;
   removeItem: (list: ListKey, id: string) => void;
+
+  replaceAllData: (data: {
+    toBuy: PackingItem[];
+    toPack: PackingItem[];
+    suggestions: PackingItem[];
+  }) => void;
+  getCurrentState: () => {
+    toBuy: PackingItem[];
+    toPack: PackingItem[];
+    suggestions: PackingItem[];
+  };
 };
 
 export const usePackingStore = create<PackingState>()(
   persist(
-    immer((set) => ({
+    immer((set, get) => ({
       toBuy: [],
       toPack: [],
       suggestions: [],
@@ -57,6 +68,19 @@ export const usePackingStore = create<PackingState>()(
         set((state) => {
           state[list] = state[list].filter((item) => item.id !== id);
         });
+      },
+
+      replaceAllData: (data) => {
+        set((state) => {
+          state.toBuy = data.toBuy ?? [];
+          state.toPack = data.toPack ?? [];
+          state.suggestions = data.suggestions ?? [];
+        });
+      },
+
+      getCurrentState: () => {
+        const { toBuy, toPack, suggestions } = get();
+        return { toBuy, toPack, suggestions };
       },
     })),
     {

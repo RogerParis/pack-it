@@ -5,7 +5,8 @@ import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { Ionicons } from '@expo/vector-icons';
 
 import { COLORS } from '../theme/colors';
-import { PackingItem } from '../types/packing';
+
+import { PackingItem } from '@/types/packing';
 
 type Props = {
   item: PackingItem;
