@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
 import PackingListItem from '@/components/packing_list_item.component';
@@ -9,12 +9,15 @@ import { PackingItem } from '@/types/packing';
 export default function ToPackScreen() {
   const { toPack, togglePacked, removeItem } = usePackingStore();
 
-  const renderItem = ({ item }: { item: PackingItem }) => (
-    <PackingListItem
-      item={item}
-      onPress={() => togglePacked(item.id)}
-      onDelete={() => removeItem('toPack', item.id)}
-    />
+  const renderItem = useCallback(
+    ({ item }: { item: PackingItem }) => (
+      <PackingListItem
+        item={item}
+        onPress={() => togglePacked(item.id)}
+        onDelete={() => removeItem('toPack', item.id)}
+      />
+    ),
+    [],
   );
 
   return (

@@ -15,7 +15,7 @@ type Props = {
   onPress?: () => void;
 };
 
-export default function PackingListItem({ item, onDelete, onMoveToPack, onPress }: Props) {
+const PackingListItem = ({ item, onDelete, onMoveToPack, onPress }: Props) => {
   const renderRightActions = () => (
     <View style={styles.actionsContainer}>
       {onMoveToPack && (
@@ -54,7 +54,9 @@ export default function PackingListItem({ item, onDelete, onMoveToPack, onPress 
       </Pressable>
     </Swipeable>
   );
-}
+};
+
+export default React.memo(PackingListItem);
 
 const styles = StyleSheet.create({
   item: {
