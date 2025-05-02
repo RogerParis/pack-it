@@ -19,6 +19,7 @@ type PackingState = {
   togglePacked: (id: string) => void;
   moveToPack: (id: string) => void;
   removeItem: (list: ListKey, id: string) => void;
+  clearList: (list: ListKey) => void;
 
   replaceAllData: (data: {
     toBuy: PackingItem[];
@@ -67,6 +68,12 @@ export const usePackingStore = create<PackingState>()(
       removeItem: (list, id) => {
         set((state) => {
           state[list] = state[list].filter((item) => item.id !== id);
+        });
+      },
+
+      clearList: (list) => {
+        set((state) => {
+          state[list] = [];
         });
       },
 
