@@ -17,7 +17,7 @@ type PackingState = {
 
   addItem: (list: ListKey, item: PackingItem) => void;
   togglePacked: (id: string) => void;
-  moveItem: (fromList: ListKey, toList: ListKey, id: string) => void;
+  copyItem: (fromList: ListKey, toList: ListKey, id: string) => void;
   removeItem: (list: ListKey, id: string) => void;
   clearList: (list: ListKey) => void;
 
@@ -55,7 +55,7 @@ export const usePackingStore = create<PackingState>()(
         });
       },
 
-      moveItem: (fromList: ListKey, toList: ListKey, id: string) => {
+      copyItem: (fromList: ListKey, toList: ListKey, id: string) => {
         set((state) => {
           if (fromList === toList) return; // No move needed
 

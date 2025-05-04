@@ -25,7 +25,7 @@ export default function SuggestionsScreen() {
   const addItem = usePackingStore((state) => state.addItem);
   const suggestions = usePackingStore((state) => state.suggestions);
   const clearList = usePackingStore((state) => state.clearList);
-  const moveItem = usePackingStore((state) => state.moveItem);
+  const copyItem = usePackingStore((state) => state.copyItem);
   const removeItem = usePackingStore((state) => state.removeItem);
 
   const [location, setLocation] = useState('');
@@ -81,16 +81,17 @@ export default function SuggestionsScreen() {
       <PackingListItem
         item={item}
         onMoveToBuy={() => {
-          moveItem('suggestions', 'toBuy', item.id);
+          copyItem('suggestions', 'toBuy', item.id);
           removeItem('suggestions', item.id);
         }}
         onMoveToPack={() => {
-          moveItem('suggestions', 'toPack', item.id);
+          copyItem('suggestions', 'toPack', item.id);
           removeItem('suggestions', item.id);
         }}
+        onDelete={() => removeItem('suggestions', item.id)}
       />
     ),
-    [moveItem, removeItem],
+    [copyItem, removeItem],
   );
 
   const formatDate = (date: Date | null) => (date ? date.toLocaleDateString() : 'Select date');
