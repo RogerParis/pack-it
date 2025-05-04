@@ -32,6 +32,8 @@ export default {
     plugins: ['@react-native-firebase/app', '@react-native-firebase/auth'],
     extra: {
       OPEN_WEATHER_API_KEY: process.env.OPEN_WEATHER_API_KEY,
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+      GROQ_API_KEY: process.env.GROQ_API_KEY,
     },
   },
 };

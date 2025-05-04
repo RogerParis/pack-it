@@ -14,6 +14,7 @@ import {
 import { usePackingStore } from '../../store/packingStore';
 import { COLORS } from '../../theme/colors';
 
+import { getPackingSuggestionsFromAI } from '@/services/groq_ai.service';
 import { getWeatherForecast } from '@/services/weather.service';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -34,6 +35,7 @@ export default function SuggestionsScreen() {
   // const [generated, setGenerated] = useState<string[]>([]);
 
   const handleGenerate = useCallback(async () => {
+    console.log('Generating suggestions...');
     let weatherHint = 'No weather data available';
 
     if (location) {
@@ -45,26 +47,23 @@ export default function SuggestionsScreen() {
       }
     }
 
-    // Calculate duration if dates are provided
-    let duration = 3; // Default to 3 days if dates missing
-    if (startDate && endDate) {
-      duration =
-        Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))) +
-        1;
-    }
+    console.log('Weather hint:', weatherHint);
+    const aiSuggestionsText = await getPackingSuggestionsFromAI(
+      location || '',
+      startDate,
+      endDate,
+      activities || '',
+      weatherHint,
+    );
 
-    // Dummy suggestions
-    const newSuggestions = [
-      'Sunscreen',
-      ...(location ? [`Map of ${location}`] : []),
-      ...(activities ? [`${activities.split(',')[0]} gear`] : ['General gear']),
-      `${duration} days worth of clothing`,
-      `Weather hint: ${weatherHint}`,
-    ];
+    console.log('AI suggestions:\n', aiSuggestionsText);
+    const aiSuggestions = aiSuggestionsText
+      .split('\n')
+      .filter((item: string) => item.trim() !== '');
 
     clearList('suggestions'); // Clear previous suggestions
 
-    newSuggestions.forEach((item) => {
+    aiSuggestions.forEach((item: string) => {
       addItem('suggestions', {
         id: `${Date.now()}-${item}`,
         name: item,
