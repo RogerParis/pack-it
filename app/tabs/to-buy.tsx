@@ -12,7 +12,7 @@ import { v4 as uuid } from 'uuid';
 
 export default function ToBuyScreen() {
   const [itemName, setItemName] = useState('');
-  const { toBuy, addItem, removeItem, moveToPack } = usePackingStore();
+  const { toBuy, addItem, removeItem, moveItem } = usePackingStore();
 
   const handleAdd = () => {
     if (!itemName.trim()) return;
@@ -29,7 +29,7 @@ export default function ToBuyScreen() {
     <PackingListItem
       item={item}
       onDelete={() => removeItem('toBuy', item.id)}
-      onMoveToPack={() => moveToPack(item.id)}
+      onMoveToPack={() => moveItem('toBuy', 'toPack', item.id)}
     />
   );
 

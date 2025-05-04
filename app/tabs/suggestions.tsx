@@ -11,8 +11,11 @@ import {
   View,
 } from 'react-native';
 
+import PackingListItem from '@/components/packing_list_item.component';
+
 import { usePackingStore } from '../../store/packingStore';
 import { COLORS } from '../../theme/colors';
+import { PackingItem } from '../../types/packing';
 
 import { getPackingSuggestionsFromAI } from '@/services/groq_ai.service';
 import { getWeatherForecast } from '@/services/weather.service';
@@ -22,6 +25,8 @@ export default function SuggestionsScreen() {
   const addItem = usePackingStore((state) => state.addItem);
   const suggestions = usePackingStore((state) => state.suggestions);
   const clearList = usePackingStore((state) => state.clearList);
+  const moveItem = usePackingStore((state) => state.moveItem);
+  const removeItem = usePackingStore((state) => state.removeItem);
 
   const [location, setLocation] = useState('');
   const [activities, setActivities] = useState('');
@@ -31,8 +36,6 @@ export default function SuggestionsScreen() {
 
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
-
-  // const [generated, setGenerated] = useState<string[]>([]);
 
   const handleGenerate = useCallback(async () => {
     console.log('Generating suggestions...');
@@ -61,7 +64,8 @@ export default function SuggestionsScreen() {
       .split('\n')
       .filter((item: string) => item.trim() !== '');
 
-    clearList('suggestions'); // Clear previous suggestions
+    clearList('suggestions');
+    console.log('Cleared previous suggestions');
 
     aiSuggestions.forEach((item: string) => {
       addItem('suggestions', {
@@ -70,9 +74,24 @@ export default function SuggestionsScreen() {
         packed: false,
       });
     });
-
-    // setGenerated(newSuggestions);
   }, [location, startDate, endDate, activities, addItem]);
+
+  const renderItem = useCallback(
+    ({ item }: { item: PackingItem }) => (
+      <PackingListItem
+        item={item}
+        onMoveToBuy={() => {
+          moveItem('suggestions', 'toBuy', item.id);
+          removeItem('suggestions', item.id);
+        }}
+        onMoveToPack={() => {
+          moveItem('suggestions', 'toPack', item.id);
+          removeItem('suggestions', item.id);
+        }}
+      />
+    ),
+    [moveItem, removeItem],
+  );
 
   const formatDate = (date: Date | null) => (date ? date.toLocaleDateString() : 'Select date');
 
@@ -136,12 +155,9 @@ export default function SuggestionsScreen() {
         <FlatList
           data={suggestions}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.suggestionItem}>
-              <Text>{item.name}</Text>
-            </View>
-          )}
+          renderItem={renderItem}
           ListEmptyComponent={<Text>No suggestions yet.</Text>}
+          contentContainerStyle={styles.list}
         />
       </KeyboardAvoidingView>
     </View>
@@ -172,4 +188,5 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 8,
   },
+  list: { gap: 12 },
 });

@@ -17,7 +17,7 @@ type PackingState = {
 
   addItem: (list: ListKey, item: PackingItem) => void;
   togglePacked: (id: string) => void;
-  moveToPack: (id: string) => void;
+  moveItem: (fromList: ListKey, toList: ListKey, id: string) => void;
   removeItem: (list: ListKey, id: string) => void;
   clearList: (list: ListKey) => void;
 
@@ -55,12 +55,14 @@ export const usePackingStore = create<PackingState>()(
         });
       },
 
-      moveToPack: (id) => {
+      moveItem: (fromList: ListKey, toList: ListKey, id: string) => {
         set((state) => {
-          const index = state.toBuy.findIndex((i) => i.id === id);
+          if (fromList === toList) return; // No move needed
+
+          const index = state[fromList].findIndex((i) => i.id === id);
           if (index !== -1) {
-            const [item] = state.toBuy.splice(index, 1);
-            state.toPack.push({ ...item, packed: false });
+            const [item] = state[fromList].splice(index, 1);
+            state[toList].push({ ...item, packed: false });
           }
         });
       },

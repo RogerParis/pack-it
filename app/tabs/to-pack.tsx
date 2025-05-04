@@ -7,7 +7,7 @@ import { usePackingStore } from '@/store/packingStore';
 import { PackingItem } from '@/types/packing';
 
 export default function ToPackScreen() {
-  const { toPack, togglePacked, removeItem } = usePackingStore();
+  const { toPack, togglePacked, removeItem, moveItem } = usePackingStore();
 
   const renderItem = useCallback(
     ({ item }: { item: PackingItem }) => (
@@ -15,6 +15,7 @@ export default function ToPackScreen() {
         item={item}
         onPress={() => togglePacked(item.id)}
         onDelete={() => removeItem('toPack', item.id)}
+        onMoveToBuy={() => moveItem('toPack', 'toBuy', item.id)}
       />
     ),
     [],

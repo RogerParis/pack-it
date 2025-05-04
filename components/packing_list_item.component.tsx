@@ -12,10 +12,11 @@ type Props = {
   item: PackingItem;
   onDelete?: () => void;
   onMoveToPack?: () => void;
+  onMoveToBuy?: () => void;
   onPress?: () => void;
 };
 
-const PackingListItem = ({ item, onDelete, onMoveToPack, onPress }: Props) => {
+const PackingListItem = ({ item, onDelete, onMoveToPack, onMoveToBuy, onPress }: Props) => {
   const renderRightActions = () => (
     <View style={styles.actionsContainer}>
       {onMoveToPack && (
@@ -23,6 +24,13 @@ const PackingListItem = ({ item, onDelete, onMoveToPack, onPress }: Props) => {
           style={[styles.actionButton, { backgroundColor: COLORS.secondary }]}
           onPress={onMoveToPack}>
           <Ionicons name="briefcase-outline" size={24} color={COLORS.white} />
+        </Pressable>
+      )}
+      {onMoveToBuy && (
+        <Pressable
+          style={[styles.actionButton, { backgroundColor: COLORS.primary }]}
+          onPress={onMoveToBuy}>
+          <Ionicons name="cart-outline" size={24} color={COLORS.white} />
         </Pressable>
       )}
       {onDelete && (
