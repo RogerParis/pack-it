@@ -1,38 +1,39 @@
 import { useState } from 'react';
-import { Alert, Button, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
-import { resetPassword } from '../services/auth.service';
-import { COLORS } from '../theme/colors';
+import { register } from '@/services/auth.service';
+import { COLORS } from '@/theme/colors';
 
-export default function ForgotPasswordScreen() {
+export default function SignupScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleReset = async () => {
+  const handleSignup = async () => {
     try {
-      await resetPassword(email);
-      Alert.alert('Success', 'Password reset email sent.');
+      await register(email, password);
       router.push('/login');
     } catch (error) {
-      console.error('Password reset failed:', error);
-      Alert.alert('Error', 'Failed to send password reset email.');
+      console.error('Signup failed:', error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Reset Password</Text>
+      <Text style={styles.title}>Sign Up</Text>
+      <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} />
       <TextInput
-        placeholder="Enter your email"
-        value={email}
-        onChangeText={setEmail}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
         style={styles.input}
       />
-      <Button title="Send Reset Email" onPress={handleReset} />
+      <Button title="Sign Up" onPress={handleSignup} />
       <Pressable onPress={() => router.push('/login')}>
-        <Text style={styles.link}>Back to Login</Text>
+        <Text style={styles.link}>Already have an account? Log in</Text>
       </Pressable>
       <Pressable onPress={() => router.push('/tabs/to-pack')}>
         <Text style={styles.link}>Continue as Guest</Text>

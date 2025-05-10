@@ -3,8 +3,8 @@ import { Button, Pressable, StyleSheet, Text, TextInput, View } from 'react-nati
 
 import { useRouter } from 'expo-router';
 
-import { useAuthStore } from '../store/authStore';
-import { COLORS } from '../theme/colors';
+import { useAuthStore } from '@/store/authStore';
+import { COLORS } from '@/theme/colors';
 
 export default function LoginScreen() {
   const router = useRouter();
