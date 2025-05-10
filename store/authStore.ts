@@ -42,7 +42,7 @@ export const useAuthStore = create<AuthState>()(
 
     signOut: async () => {
       const { user } = get();
-      const getCurrentState = usePackingStore((state) => state.getCurrentState);
+      const { getCurrentState } = usePackingStore.getState();
 
       const currentData = getCurrentState();
       await saveUserPackingData(
