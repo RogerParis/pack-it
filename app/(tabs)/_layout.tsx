@@ -12,7 +12,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerRight: () => (
-          <Pressable onPress={() => router.push('/profile')} style={{ marginRight: 16 }}>
+          <Pressable onPress={() => router.push('/(profile)')} style={{ marginRight: 16 }}>
             <Ionicons name="person-circle-outline" size={28} color={COLORS.primary} />
           </Pressable>
         ),

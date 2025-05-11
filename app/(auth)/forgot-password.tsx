@@ -34,7 +34,7 @@ export default function ForgotPasswordScreen() {
       <Pressable onPress={() => router.push('/login')}>
         <Text style={styles.link}>Back to Login</Text>
       </Pressable>
-      <Pressable onPress={() => router.push('/tabs/to-pack')}>
+      <Pressable onPress={() => router.push('/to-pack')}>
         <Text style={styles.link}>Continue as Guest</Text>
       </Pressable>
     </View>

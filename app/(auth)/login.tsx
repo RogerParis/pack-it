@@ -15,7 +15,7 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
       await signIn(email, password);
-      router.push('/tabs/to-pack');
+      router.push('/to-pack');
     } catch (error) {
       console.error('Login failed:', error);
     }
@@ -39,7 +39,7 @@ export default function LoginScreen() {
       <Pressable onPress={() => router.push('/signup')}>
         <Text style={styles.link}>Don't have an account? Sign up</Text>
       </Pressable>
-      <Pressable onPress={() => router.push('/tabs/to-pack')}>
+      <Pressable onPress={() => router.push('/to-pack')}>
         <Text style={styles.link}>Continue as Guest</Text>
       </Pressable>
     </View>

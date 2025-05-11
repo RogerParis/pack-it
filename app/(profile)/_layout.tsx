@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Stack } from 'expo-router';
 
-export default function AuthLayout() {
+export default function ProfileLayout() {
   return (
     <Stack
       screenOptions={{
