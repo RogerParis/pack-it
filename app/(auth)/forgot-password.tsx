@@ -31,10 +31,10 @@ export default function ForgotPasswordScreen() {
         style={styles.input}
       />
       <Button title="Send Reset Email" onPress={handleReset} />
-      <Pressable onPress={() => router.push('/login')}>
+      <Pressable onPress={() => router.back()}>
         <Text style={styles.link}>Back to Login</Text>
       </Pressable>
-      <Pressable onPress={() => router.push('/to-pack')}>
+      <Pressable onPress={() => router.replace('/to-pack')}>
         <Text style={styles.link}>Continue as Guest</Text>
       </Pressable>
     </View>

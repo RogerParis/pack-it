@@ -39,7 +39,7 @@ export default function LoginScreen() {
       <Pressable onPress={() => router.push('/signup')}>
         <Text style={styles.link}>Don't have an account? Sign up</Text>
       </Pressable>
-      <Pressable onPress={() => router.push('/to-pack')}>
+      <Pressable onPress={() => router.replace('/to-pack')}>
         <Text style={styles.link}>Continue as Guest</Text>
       </Pressable>
     </View>

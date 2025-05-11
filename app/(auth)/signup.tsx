@@ -32,10 +32,10 @@ export default function SignupScreen() {
         style={styles.input}
       />
       <Button title="Sign Up" onPress={handleSignup} />
-      <Pressable onPress={() => router.push('/login')}>
+      <Pressable onPress={() => router.back()}>
         <Text style={styles.link}>Already have an account? Log in</Text>
       </Pressable>
-      <Pressable onPress={() => router.push('/to-pack')}>
+      <Pressable onPress={() => router.replace('/to-pack')}>
         <Text style={styles.link}>Continue as Guest</Text>
       </Pressable>
     </View>
