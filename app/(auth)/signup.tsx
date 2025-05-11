@@ -18,7 +18,7 @@ import { COLORS } from '@/theme/colors';
 
 export default function SignupScreen() {
   const router = useRouter();
-  const register = useAuthStore((state) => state.register);
+  const register = useAuthStore((state) => state.signUp);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
