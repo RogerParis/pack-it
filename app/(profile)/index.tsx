@@ -17,10 +17,6 @@ export default function ProfileScreen() {
     router.push('/login');
   }, [router]);
 
-  const handleSignUp = useCallback(() => {
-    router.push('/signup');
-  }, [router]);
-
   const handleSync = useCallback(() => {
     const currentData = getCurrentState();
     saveUserPackingData(user!, currentData.toBuy, currentData.toPack, currentData.suggestions);
@@ -28,13 +24,8 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profile</Text>
-
       {!user ? (
-        <>
-          <Button title="Log In" onPress={handleLogin} />
-          <Button title="Sign Up" onPress={handleSignUp} />
-        </>
+        <Button title="Log In" onPress={handleLogin} />
       ) : (
         <>
           <Text style={styles.loggedInText}>Logged in as: {user}</Text>

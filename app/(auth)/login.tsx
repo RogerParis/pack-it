@@ -1,5 +1,13 @@
-import { useState } from 'react';
-import { Button, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import React, { useState } from 'react';
+import {
+  ActivityIndicator,
+  Button,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
 import { useRouter } from 'expo-router';
 
@@ -9,36 +17,77 @@ import { COLORS } from '@/theme/colors';
 export default function LoginScreen() {
   const router = useRouter();
   const signIn = useAuthStore((state) => state.signIn);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      setError('Please enter both email and password.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
     try {
       await signIn(email, password);
       router.push('/to-pack');
-    } catch (error) {
-      console.error('Login failed:', error);
+    } catch (err) {
+      console.error('Login failed:', err);
+      setError('Invalid email or password.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} />
+      <Text style={styles.title}>Log In</Text>
+
+      <TextInput
+        placeholder="Email"
+        value={email}
+        onChangeText={(text) => {
+          setEmail(text);
+          setError('');
+        }}
+        style={styles.input}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
       <TextInput
         placeholder="Password"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(text) => {
+          setPassword(text);
+          setError('');
+        }}
         secureTextEntry
         style={styles.input}
       />
-      <Button title="Login" onPress={handleLogin} />
-      <Pressable onPress={() => router.push('/forgot-password')}>
-        <Text style={styles.link}>Forgot Password?</Text>
-      </Pressable>
+
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+
+      <Button
+        title={loading ? 'Logging in...' : 'Login'}
+        onPress={handleLogin}
+        disabled={loading}
+      />
+
+      {loading && (
+        <ActivityIndicator size="small" color={COLORS.primary} style={{ marginTop: 12 }} />
+      )}
+
       <Pressable onPress={() => router.push('/signup')}>
         <Text style={styles.link}>Don't have an account? Sign up</Text>
       </Pressable>
+
+      <Pressable onPress={() => router.push('/forgot-password')}>
+        <Text style={styles.link}>Forgot password?</Text>
+      </Pressable>
+
       <Pressable onPress={() => router.replace('/to-pack')}>
         <Text style={styles.link}>Continue as Guest</Text>
       </Pressable>
@@ -53,8 +102,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.neutral300,
     padding: 12,
-    marginBottom: 16,
+    marginBottom: 12,
     borderRadius: 6,
+  },
+  error: {
+    color: COLORS.error,
+    marginBottom: 12,
+    textAlign: 'center',
+    fontSize: 14,
   },
   link: { color: COLORS.primary, marginTop: 12, textAlign: 'center' },
 });

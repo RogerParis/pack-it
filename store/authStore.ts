@@ -1,6 +1,6 @@
 import { usePackingStore } from './packingStore';
-import { login, logout, register } from '../services/auth.service';
 
+import { login, logout, register } from '@/services/auth.service';
 import { saveUserPackingData } from '@/services/cloud.service';
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { create } from 'zustand';
