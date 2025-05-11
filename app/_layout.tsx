@@ -3,7 +3,8 @@ import { AppState } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { Slot } from 'expo-router';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 
 import { onUserAuthStateChanged } from '../services/auth.service';
 import { useAuthStore } from '../store/authStore';
@@ -70,7 +71,36 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <Slot />
+        <StatusBar style="auto" />
+        <Stack
+          screenOptions={{
+            headerShown: true,
+          }}>
+          <Stack.Screen
+            name="(auth)"
+            options={{
+              headerShown: false,
+              animation: 'fade_from_bottom',
+            }}
+          />
+
+          <Stack.Screen
+            name="(tabs)"
+            options={{
+              headerShown: false,
+              gestureEnabled: false,
+            }}
+          />
+
+          <Stack.Screen
+            name="(profile)"
+            options={{
+              headerShown: true,
+              headerTitle: 'Profile',
+              headerBackButtonDisplayMode: 'minimal',
+            }}
+          />
+        </Stack>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

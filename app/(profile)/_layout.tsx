@@ -6,7 +6,7 @@ export default function ProfileLayout() {
   return (
     <Stack
       screenOptions={{
-        gestureEnabled: false,
+        headerShown: false,
       }}>
       <Stack.Screen name="index" />
     </Stack>
