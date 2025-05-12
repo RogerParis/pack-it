@@ -1,5 +1,12 @@
 import { PackingItem } from '@/types/packing';
-import { collection, doc, getDoc, getFirestore, setDoc } from '@react-native-firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getFirestore,
+  serverTimestamp,
+  setDoc,
+} from '@react-native-firebase/firestore';
 
 const firestore = getFirestore();
 
@@ -18,6 +25,8 @@ export const saveUserPackingData = async (
 ) => {
   const docRef = doc(collection(firestore, 'users'), uid);
   await setDoc(docRef, {
+    schemaVersion: 1,
+    lastSyncedAt: serverTimestamp(),
     toBuy,
     toPack,
     suggestions,
