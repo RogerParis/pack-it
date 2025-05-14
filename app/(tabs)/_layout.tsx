@@ -3,17 +3,23 @@ import { Pressable } from 'react-native';
 import { Tabs, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
+import { useAuthStore } from '@/store/authStore';
 import { COLORS } from '@/theme/colors';
 
 export default function TabLayout() {
   const router = useRouter();
+  const user = useAuthStore((state) => state.user);
 
   return (
     <Tabs
       screenOptions={{
         headerRight: () => (
           <Pressable onPress={() => router.push('/(profile)')} style={{ marginRight: 16 }}>
-            <Ionicons name="person-circle-outline" size={28} color={COLORS.primary} />
+            <Ionicons
+              name={user ? 'person-circle' : 'log-in-outline'}
+              size={28}
+              color={COLORS.primary}
+            />
           </Pressable>
         ),
         headerShown: true,
