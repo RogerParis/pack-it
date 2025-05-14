@@ -79,7 +79,8 @@ const styles = StyleSheet.create({
   },
   actionsContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'stretch',
+    height: '100%',
   },
   actionButton: {
     justifyContent: 'center',
@@ -87,5 +88,6 @@ const styles = StyleSheet.create({
     width: 80,
     borderRadius: 8,
     marginLeft: 8,
+    height: '100%',
   },
 });
