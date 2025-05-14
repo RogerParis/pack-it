@@ -31,6 +31,9 @@ type PackingState = {
     toPack: PackingItem[];
     suggestions: PackingItem[];
   };
+
+  lastSyncedAt: number | null; // store as timestamp (Date.now())
+  setLastSyncedAt: (ts: number) => void;
 };
 
 export const usePackingStore = create<PackingState>()(
@@ -39,6 +42,7 @@ export const usePackingStore = create<PackingState>()(
       toBuy: [],
       toPack: [],
       suggestions: [],
+      lastSyncedAt: null,
 
       addItem: (list, item) => {
         set((state) => {
@@ -90,6 +94,12 @@ export const usePackingStore = create<PackingState>()(
       getCurrentState: () => {
         const { toBuy, toPack, suggestions } = get();
         return { toBuy, toPack, suggestions };
+      },
+
+      setLastSyncedAt: (ts) => {
+        set((state) => {
+          state.lastSyncedAt = ts;
+        });
       },
     })),
     {

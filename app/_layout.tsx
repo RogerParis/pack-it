@@ -18,6 +18,7 @@ export default function RootLayout() {
   const user = useAuthStore((state) => state.user);
   const replaceAllData = usePackingStore((state) => state.replaceAllData);
   const getCurrentState = usePackingStore((state) => state.getCurrentState);
+  const setLastSyncedAt = usePackingStore((state) => state.setLastSyncedAt);
 
   // Watch for Firebase login state and sync data
   useEffect(() => {
@@ -33,6 +34,7 @@ export default function RootLayout() {
             toPack: cloudData.toPack ?? [],
             suggestions: cloudData.suggestions ?? [],
           });
+          setLastSyncedAt(cloudData.lastSyncedAt ? cloudData.lastSyncedAt.toMillis() : null);
         } else {
           // No data → upload local MMKV data
           const localData = getCurrentState();

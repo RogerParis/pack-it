@@ -1,3 +1,4 @@
+import { usePackingStore } from '@/store/packingStore';
 import { PackingItem } from '@/types/packing';
 import {
   collection,
@@ -23,6 +24,7 @@ export const saveUserPackingData = async (
   toPack: PackingItem[],
   suggestions: PackingItem[],
 ) => {
+  usePackingStore.getState().setLastSyncedAt(Date.now());
   const docRef = doc(collection(firestore, 'users'), uid);
   await setDoc(docRef, {
     schemaVersion: 1,
