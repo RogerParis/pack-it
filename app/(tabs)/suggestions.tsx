@@ -1,17 +1,8 @@
-import React, { useCallback, useState } from 'react';
-import {
-  Button,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import React, { useCallback } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import PackingListItem from '@/components/packing_list_item.component';
+import SuggestionsListHeader from '@/components/suggestions_list_header.component';
 
 import { usePackingStore } from '../../store/packingStore';
 import { COLORS } from '../../theme/colors';
@@ -19,7 +10,6 @@ import { PackingItem } from '../../types/packing';
 
 import { getPackingSuggestionsFromAI } from '@/services/groq_ai.service';
 import { getWeatherForecast } from '@/services/weather.service';
-import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function SuggestionsScreen() {
   const addItem = usePackingStore((state) => state.addItem);
@@ -28,53 +18,57 @@ export default function SuggestionsScreen() {
   const copyItem = usePackingStore((state) => state.copyItem);
   const removeItem = usePackingStore((state) => state.removeItem);
 
-  const [location, setLocation] = useState('');
-  const [activities, setActivities] = useState('');
-
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
-
-  const handleGenerate = useCallback(async () => {
-    console.log('Generating suggestions...');
-    let weatherHint = 'No weather data available';
-
-    if (location) {
-      try {
-        const weatherData = await getWeatherForecast(location);
-        weatherHint = weatherData?.list?.[0]?.weather?.[0]?.description || 'No forecast';
-      } catch (error) {
-        console.warn('Failed to fetch weather data:', error);
-      }
-    }
-
-    console.log('Weather hint:', weatherHint);
-    const aiSuggestionsText = await getPackingSuggestionsFromAI(
-      location || '',
+  const handleGenerate = useCallback(
+    async ({
+      location,
       startDate,
       endDate,
-      activities || '',
-      weatherHint,
-    );
+      activities,
+    }: {
+      location?: string;
+      startDate: Date | null;
+      endDate: Date | null;
+      activities?: string;
+    }) => {
+      console.log('Generating suggestions...');
+      let weatherHint = 'No weather data available';
 
-    console.log('AI suggestions:\n', aiSuggestionsText);
-    const aiSuggestions = aiSuggestionsText
-      .split('\n')
-      .filter((item: string) => item.trim() !== '');
+      if (location) {
+        try {
+          const weatherData = await getWeatherForecast(location);
+          weatherHint = weatherData?.list?.[0]?.weather?.[0]?.description || 'No forecast';
+        } catch (error) {
+          console.warn('Failed to fetch weather data:', error);
+        }
+      }
 
-    clearList('suggestions');
-    console.log('Cleared previous suggestions');
+      console.log('Weather hint:', weatherHint);
+      const aiSuggestionsText = await getPackingSuggestionsFromAI(
+        location || '',
+        startDate,
+        endDate,
+        activities || '',
+        weatherHint,
+      );
 
-    aiSuggestions.forEach((item: string) => {
-      addItem('suggestions', {
-        id: `${Date.now()}-${item}`,
-        name: item,
-        packed: false,
+      console.log('AI suggestions:\n', aiSuggestionsText);
+      const aiSuggestions = aiSuggestionsText
+        .split('\n')
+        .filter((item: string) => item.trim() !== '');
+
+      clearList('suggestions');
+      console.log('Cleared previous suggestions');
+
+      aiSuggestions.forEach((item: string) => {
+        addItem('suggestions', {
+          id: `${Date.now()}-${item}`,
+          name: item,
+          packed: false,
+        });
       });
-    });
-  }, [location, startDate, endDate, activities, addItem]);
+    },
+    [addItem, clearList],
+  );
 
   const renderItem = useCallback(
     ({ item }: { item: PackingItem }) => (
@@ -94,73 +88,16 @@ export default function SuggestionsScreen() {
     [copyItem, removeItem],
   );
 
-  const formatDate = (date: Date | null) => (date ? date.toLocaleDateString() : 'Select date');
-
   return (
     <View style={{ flex: 1 }}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <Text style={styles.heading}>🤖 AI Suggestions</Text>
-
-        <TextInput
-          placeholder="Destination"
-          value={location}
-          onChangeText={setLocation}
-          style={styles.input}
-        />
-
-        <Pressable style={styles.dateButton} onPress={() => setShowStartPicker(true)}>
-          <Text>Start Date: {formatDate(startDate)}</Text>
-        </Pressable>
-
-        {showStartPicker && (
-          <DateTimePicker
-            value={startDate || new Date()}
-            mode="date"
-            display="default"
-            onChange={(_, date) => {
-              setShowStartPicker(false);
-              if (date) setStartDate(date);
-            }}
-          />
-        )}
-
-        <Pressable style={styles.dateButton} onPress={() => setShowEndPicker(true)}>
-          <Text>End Date: {formatDate(endDate)}</Text>
-        </Pressable>
-
-        {showEndPicker && (
-          <DateTimePicker
-            value={endDate || new Date()}
-            mode="date"
-            display="default"
-            onChange={(_, date) => {
-              setShowEndPicker(false);
-              if (date) setEndDate(date);
-            }}
-          />
-        )}
-
-        <TextInput
-          placeholder="Activities (comma-separated)"
-          value={activities}
-          onChangeText={setActivities}
-          style={styles.input}
-        />
-
-        <Button title="Generate Suggestions" onPress={handleGenerate} />
-
-        <Text style={styles.subheading}>Generated Suggestions:</Text>
-
-        <FlatList
-          data={suggestions}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          ListEmptyComponent={<Text>No suggestions yet.</Text>}
-          contentContainerStyle={styles.list}
-        />
-      </KeyboardAvoidingView>
+      <FlatList
+        ListHeaderComponent={<SuggestionsListHeader onGenerate={handleGenerate} />}
+        data={suggestions}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        ListEmptyComponent={<Text>No suggestions yet.</Text>}
+        contentContainerStyle={styles.list}
+      />
     </View>
   );
 }
