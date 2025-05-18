@@ -16,6 +16,8 @@ export default function SuggestionsScreen() {
   const clearList = usePackingStore((state) => state.clearList);
   const copyItem = usePackingStore((state) => state.copyItem);
   const removeItem = usePackingStore((state) => state.removeItem);
+  const toBuy = usePackingStore((state) => state.toBuy);
+  const toPack = usePackingStore((state) => state.toPack);
 
   const handleGenerate = useCallback(
     async ({
@@ -51,9 +53,15 @@ export default function SuggestionsScreen() {
       );
 
       console.log('AI suggestions:\n', aiSuggestionsText);
+      const existingItems = new Set(
+        [...toBuy, ...toPack].map((item) => item.name.trim().toLowerCase()),
+      );
+      console.log('Existing items:', existingItems);
+
       const aiSuggestions = aiSuggestionsText
         .split('\n')
-        .filter((item: string) => item.trim() !== '');
+        .map((item: string) => item.trim())
+        .filter((item: string) => item && !existingItems.has(item.toLowerCase()));
 
       clearList('suggestions');
       console.log('Cleared previous suggestions');
@@ -66,7 +74,7 @@ export default function SuggestionsScreen() {
         });
       });
     },
-    [addItem, clearList],
+    [addItem, clearList, toBuy, toPack],
   );
 
   const renderItem = useCallback(
