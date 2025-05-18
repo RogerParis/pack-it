@@ -5,7 +5,6 @@ import PackingListItem from '@/components/packing_list_item.component';
 import SuggestionsListHeader from '@/components/suggestions_list_header.component';
 
 import { usePackingStore } from '../../store/packingStore';
-import { COLORS } from '../../theme/colors';
 import { PackingItem } from '../../types/packing';
 
 import { getPackingSuggestionsFromAI } from '@/services/groq_ai.service';
@@ -103,28 +102,5 @@ export default function SuggestionsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  heading: { fontSize: 22, fontWeight: 'bold', marginBottom: 12 },
-  subheading: { marginTop: 16, fontWeight: 'bold' },
-  input: {
-    borderWidth: 1,
-    borderColor: COLORS.neutral300,
-    padding: 12,
-    marginBottom: 12,
-    borderRadius: 6,
-  },
-  dateButton: {
-    borderWidth: 1,
-    borderColor: COLORS.neutral300,
-    padding: 12,
-    marginBottom: 12,
-    borderRadius: 6,
-  },
-  suggestionItem: {
-    padding: 12,
-    backgroundColor: COLORS.background,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
   list: { gap: 12 },
 });
