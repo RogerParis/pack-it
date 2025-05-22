@@ -13,6 +13,11 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
+        headerLeft: () => (
+          <Pressable onPress={() => router.push('/(donate)')} style={{ marginLeft: 16 }}>
+            <Ionicons name="cafe-outline" size={24} color={COLORS.primary} />
+          </Pressable>
+        ),
         headerRight: () => (
           <Pressable onPress={() => router.push('/(profile)')} style={{ marginRight: 16 }}>
             <Ionicons
@@ -22,6 +27,7 @@ export default function TabLayout() {
             />
           </Pressable>
         ),
+
         headerShown: true,
       }}>
       <Tabs.Screen

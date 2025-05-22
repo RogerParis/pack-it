@@ -102,6 +102,15 @@ export default function RootLayout() {
               headerBackButtonDisplayMode: 'minimal',
             }}
           />
+
+          <Stack.Screen
+            name="(donate)"
+            options={{
+              headerShown: true,
+              headerTitle: 'Thanks for your support!',
+              headerBackButtonDisplayMode: 'minimal',
+            }}
+          />
         </Stack>
       </SafeAreaProvider>
     </GestureHandlerRootView>
