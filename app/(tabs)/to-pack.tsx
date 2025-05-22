@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
 import AddPackingItemInput from '@/components/add_packing_item_input.component';
@@ -9,7 +9,16 @@ import { PackingItem } from '@/types/packing';
 import { v4 as uuid } from 'uuid';
 
 export default function ToPackScreen() {
-  const { toPack, togglePacked, removeItem, copyItem, addItem } = usePackingStore();
+  const { togglePacked, removeItem, copyItem, addItem } = usePackingStore();
+
+  const rawToPack = usePackingStore((state) => state.toPack);
+
+  const sortedToPack = useMemo(() => {
+    return [...rawToPack].sort((a, b) => {
+      if (a.packed === b.packed) return 0;
+      return a.packed ? 1 : -1; // unpacked first
+    });
+  }, [rawToPack]);
 
   const handleAdd = useCallback(
     (name: string) => {
@@ -40,7 +49,7 @@ export default function ToPackScreen() {
       <AddPackingItemInput onAdd={handleAdd} />
 
       <FlatList
-        data={toPack}
+        data={sortedToPack}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
