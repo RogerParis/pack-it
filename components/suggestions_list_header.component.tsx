@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import {
-  Button,
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
 } from 'react-native';
 
 import { COLORS } from '@/theme/colors';
@@ -18,7 +19,7 @@ type Props = {
     startDate: Date | null;
     endDate: Date | null;
     activities: string;
-  }) => void;
+  }) => Promise<void>;
 };
 
 export default function SuggestionsListHeader({ onGenerate }: Props) {
@@ -28,11 +29,17 @@ export default function SuggestionsListHeader({ onGenerate }: Props) {
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const formatDate = (date: Date | null) => (date ? date.toLocaleDateString() : 'Select date');
 
-  const handleGenerate = () => {
-    onGenerate({ location, startDate, endDate, activities });
+  const handleGenerate = async () => {
+    setLoading(true);
+    try {
+      await onGenerate({ location, startDate, endDate, activities });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -87,7 +94,16 @@ export default function SuggestionsListHeader({ onGenerate }: Props) {
         style={styles.input}
       />
 
-      <Button title="Generate Suggestions" onPress={handleGenerate} />
+      <TouchableOpacity
+        onPress={handleGenerate}
+        disabled={loading}
+        style={[styles.button, loading && styles.buttonDisabled]}>
+        {loading ? (
+          <ActivityIndicator color={COLORS.white} />
+        ) : (
+          <Text style={styles.buttonText}>Generate Suggestions</Text>
+        )}
+      </TouchableOpacity>
 
       <Text style={styles.subheading}>Generated Suggestions:</Text>
     </KeyboardAvoidingView>
@@ -111,5 +127,20 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
     borderRadius: 6,
+  },
+  button: {
+    backgroundColor: COLORS.primary,
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  buttonDisabled: {
+    backgroundColor: COLORS.neutral300,
+  },
+  buttonText: {
+    color: COLORS.white,
+    fontWeight: '600',
+    fontSize: 16,
   },
 });
