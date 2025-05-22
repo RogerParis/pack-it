@@ -1,6 +1,6 @@
 import { usePackingStore } from './packingStore';
 
-import { login, logout, register } from '@/services/auth.service';
+import { login, register } from '@/services/auth.service';
 import { saveUserPackingData } from '@/services/cloud.service';
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { create } from 'zustand';
@@ -41,21 +41,32 @@ export const useAuthStore = create<AuthState>()(
     },
 
     signOut: async () => {
-      const { user } = get();
-      const { getCurrentState } = usePackingStore.getState();
+      const state = get();
+      const userId = state.user;
 
-      const currentData = getCurrentState();
-      await saveUserPackingData(
-        user!,
-        currentData.toBuy,
-        currentData.toPack,
-        currentData.suggestions,
-      );
+      if (!userId) {
+        // Already a guest, just clear local lists
+        usePackingStore.getState().clearAllLists();
+        return;
+      }
 
-      await logout();
-      set((state) => {
-        state.user = null;
-      });
+      try {
+        const packingState = usePackingStore.getState().getCurrentState();
+
+        await saveUserPackingData(
+          userId,
+          packingState.toBuy,
+          packingState.toPack,
+          packingState.suggestions,
+        );
+
+        console.log('[authStore] Data saved to cloud before logout.');
+      } catch (error) {
+        console.warn('[authStore] Failed to save data before logout:', error);
+      }
+
+      usePackingStore.getState().clearAllLists();
+      set({ user: null });
     },
   })),
 );

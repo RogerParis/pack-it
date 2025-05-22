@@ -20,6 +20,7 @@ type PackingState = {
   copyItem: (fromList: ListKey, toList: ListKey, id: string) => void;
   removeItem: (list: ListKey, id: string) => void;
   clearList: (list: ListKey) => void;
+  clearAllLists: () => void;
 
   replaceAllData: (data: {
     toBuy: PackingItem[];
@@ -80,6 +81,14 @@ export const usePackingStore = create<PackingState>()(
       clearList: (list) => {
         set((state) => {
           state[list] = [];
+        });
+      },
+
+      clearAllLists: () => {
+        set((state) => {
+          state.toBuy = [];
+          state.toPack = [];
+          state.suggestions = [];
         });
       },
 
