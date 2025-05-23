@@ -34,7 +34,11 @@ export default function RootLayout() {
             toPack: cloudData.toPack ?? [],
             suggestions: cloudData.suggestions ?? [],
           });
-          setLastSyncedAt(cloudData.lastSyncedAt ? cloudData.lastSyncedAt.toMillis() : null);
+          setLastSyncedAt(
+            cloudData.lastSyncedAt
+              ? new Date(cloudData.lastSyncedAt.seconds).getTime()
+              : Date.now(),
+          );
         } else {
           // No data → upload local MMKV data
           const localData = getCurrentState();
