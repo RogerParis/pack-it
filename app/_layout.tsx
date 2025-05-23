@@ -18,7 +18,6 @@ export default function RootLayout() {
   const user = useAuthStore((state) => state.user);
   const replaceAllData = usePackingStore((state) => state.replaceAllData);
   const setLastSyncedAt = usePackingStore((state) => state.setLastSyncedAt);
-
   // Watch for Firebase login state and sync data
   useEffect(() => {
     const unsubscribe = onUserAuthStateChanged(async (firebaseUser) => {

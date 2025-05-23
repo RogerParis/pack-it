@@ -6,11 +6,14 @@ export type PackingItem = {
 
 export type ListType = 'toBuy' | 'toPack' | 'suggestions';
 
-export type PackingData = {
+export type PackingListData = {
+  name: string;
   toBuy: PackingItem[];
   toPack: PackingItem[];
   suggestions: PackingItem[];
 };
+
+export type PackingListDataRecord = Record<string, PackingListData>;
 
 export type FirestoreTimestamp = {
   seconds: number;
@@ -20,12 +23,5 @@ export type FirestoreTimestamp = {
 export type CloudPackingData = {
   schemaVersion: number;
   lastSyncedAt: FirestoreTimestamp;
-  lists: Record<
-    string,
-    {
-      toBuy: PackingItem[];
-      toPack: PackingItem[];
-      suggestions: PackingItem[];
-    }
-  >;
+  lists: PackingListDataRecord;
 };

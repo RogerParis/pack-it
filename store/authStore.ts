@@ -26,6 +26,7 @@ export const useAuthStore = create<AuthState>()(
 
     signIn: async (email, password) => {
       const credential = await login(email, password);
+      usePackingStore.getState().setActiveList('default');
       const user = credential.user as FirebaseAuthTypes.User;
       const uid = user.uid;
       set((state) => {

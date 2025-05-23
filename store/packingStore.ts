@@ -1,7 +1,8 @@
 import { MMKV } from 'react-native-mmkv';
 
-import { ListType, PackingItem } from '../types/packing';
+import { ListType, PackingItem, PackingListDataRecord } from '../types/packing';
 
+import { v4 as uuidv4 } from 'uuid';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
@@ -9,14 +10,7 @@ import { immer } from 'zustand/middleware/immer';
 const storage = new MMKV();
 
 type PackingState = {
-  lists: Record<
-    string,
-    {
-      toBuy: PackingItem[];
-      toPack: PackingItem[];
-      suggestions: PackingItem[];
-    }
-  >;
+  lists: PackingListDataRecord;
   activeList: string | null;
 
   createList: (name: string) => void;
@@ -30,48 +24,38 @@ type PackingState = {
   clearAllLists: () => void;
   lastSyncedAt: number | null;
   setLastSyncedAt: (ts: number) => void;
-  replaceAllData: (
-    lists: Record<
-      string,
-      {
-        toBuy: PackingItem[];
-        toPack: PackingItem[];
-        suggestions: PackingItem[];
-      }
-    >,
-  ) => void;
+  replaceAllData: (lists: PackingListDataRecord) => void;
 };
 
 export const usePackingStore = create<PackingState>()(
   persist(
     immer((set) => ({
       lists: {
-        default: { toBuy: [], toPack: [], suggestions: [] },
+        default: { name: 'Default', toBuy: [], toPack: [], suggestions: [] },
       },
       activeList: 'default',
       lastSyncedAt: null,
 
       createList: (name) => {
         set((state) => {
-          if (!state.lists[name]) {
-            state.lists[name] = { toBuy: [], toPack: [], suggestions: [] };
+          const id = uuidv4();
+          state.lists[id] = { name, toBuy: [], toPack: [], suggestions: [] };
+        });
+      },
+
+      deleteList: (id) => {
+        set((state) => {
+          delete state.lists[id];
+          if (state.activeList === id) {
+            state.activeList = Object.keys(state.lists)[0] || null;
           }
         });
       },
 
-      deleteList: (name) => {
+      setActiveList: (id) => {
         set((state) => {
-          delete state.lists[name];
-          if (state.activeList === name) {
-            state.activeList = 'default';
-          }
-        });
-      },
-
-      setActiveList: (name) => {
-        set((state) => {
-          if (state.lists[name]) {
-            state.activeList = name;
+          if (state.lists[id]) {
+            state.activeList = id;
           }
         });
       },
@@ -127,7 +111,7 @@ export const usePackingStore = create<PackingState>()(
 
       clearAllLists: () => {
         set((state) => {
-          state.lists = { default: { toBuy: [], toPack: [], suggestions: [] } };
+          state.lists = { default: { name: 'Default', toBuy: [], toPack: [], suggestions: [] } };
           state.activeList = 'default';
         });
       },
@@ -138,16 +122,7 @@ export const usePackingStore = create<PackingState>()(
         });
       },
 
-      replaceAllData: (
-        lists: Record<
-          string,
-          {
-            toBuy: PackingItem[];
-            toPack: PackingItem[];
-            suggestions: PackingItem[];
-          }
-        >,
-      ) => {
+      replaceAllData: (lists: PackingListDataRecord) => {
         set((state) => {
           state.lists = lists;
         });

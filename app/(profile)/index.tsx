@@ -86,7 +86,7 @@ export default function ProfileScreen() {
             keyExtractor={(item) => item}
             renderItem={({ item }) => (
               <TouchableOpacity style={styles.listItem} onPress={() => handleSelectList(item)}>
-                <Text style={styles.listItemText}>{item}</Text>
+                <Text style={styles.listItemText}>{lists[item].name}</Text>
               </TouchableOpacity>
             )}
           />
