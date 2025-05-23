@@ -62,8 +62,6 @@ export const useAuthStore = create<AuthState>()(
         );
 
         await logout();
-
-        console.log('[authStore] Data saved to cloud before logout.');
       } catch (error) {
         console.warn('[authStore] Failed to save data before logout:', error);
       }
