@@ -5,3 +5,22 @@ export type PackingItem = {
 };
 
 export type ListType = 'toBuy' | 'toPack' | 'suggestions';
+
+export type PackingData = {
+  toBuy: PackingItem[];
+  toPack: PackingItem[];
+  suggestions: PackingItem[];
+};
+
+export type FirestoreTimestamp = {
+  seconds: number;
+  nanoseconds: number;
+};
+
+export type CloudPackingData = {
+  schemaVersion: number;
+  lastSyncedAt: FirestoreTimestamp;
+  toBuy: PackingItem[];
+  toPack: PackingItem[];
+  suggestions: PackingItem[];
+};
