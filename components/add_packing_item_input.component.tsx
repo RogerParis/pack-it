@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Button, StyleSheet, TextInput, View } from 'react-native';
 
 import { COLORS } from '@/theme/colors';
@@ -10,6 +10,7 @@ type Props = {
 
 export default function AddPackingItemInput({ onAdd, placeholder = 'Add item...' }: Props) {
   const [value, setValue] = useState('');
+  const inputRef = useRef<TextInput>(null);
 
   const handleAdd = useCallback(() => {
     const trimmed = value.trim();
@@ -17,11 +18,16 @@ export default function AddPackingItemInput({ onAdd, placeholder = 'Add item...'
 
     onAdd(trimmed);
     setValue('');
+
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 50);
   }, [onAdd, value]);
 
   return (
     <View style={styles.inputRow}>
       <TextInput
+        ref={inputRef}
         value={value}
         onChangeText={setValue}
         placeholder={placeholder}
