@@ -1,6 +1,6 @@
 import { usePackingStore } from './packingStore';
 
-import { login, register } from '@/services/auth.service';
+import { login, logout, register } from '@/services/auth.service';
 import { saveUserPackingData } from '@/services/cloud.service';
 import { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import { create } from 'zustand';
@@ -59,6 +59,8 @@ export const useAuthStore = create<AuthState>()(
           packingState.toPack,
           packingState.suggestions,
         );
+
+        await logout();
 
         console.log('[authStore] Data saved to cloud before logout.');
       } catch (error) {
