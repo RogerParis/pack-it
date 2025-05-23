@@ -1,6 +1,6 @@
 import { MMKV } from 'react-native-mmkv';
 
-import { PackingItem } from '../types/packing';
+import { ListType, PackingItem } from '../types/packing';
 
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -8,18 +8,16 @@ import { immer } from 'zustand/middleware/immer';
 
 const storage = new MMKV();
 
-type ListKey = 'toBuy' | 'toPack' | 'suggestions';
-
 type PackingState = {
   toBuy: PackingItem[];
   toPack: PackingItem[];
   suggestions: PackingItem[];
 
-  addItem: (list: ListKey, item: PackingItem) => void;
+  addItem: (list: ListType, item: PackingItem) => void;
   togglePacked: (id: string) => void;
-  copyItem: (fromList: ListKey, toList: ListKey, id: string) => void;
-  removeItem: (list: ListKey, id: string) => void;
-  clearList: (list: ListKey) => void;
+  copyItem: (fromList: ListType, toList: ListType, id: string) => void;
+  removeItem: (list: ListType, id: string) => void;
+  clearList: (list: ListType) => void;
   clearAllLists: () => void;
 
   replaceAllData: (data: {
@@ -60,7 +58,7 @@ export const usePackingStore = create<PackingState>()(
         });
       },
 
-      copyItem: (fromList: ListKey, toList: ListKey, id: string) => {
+      copyItem: (fromList: ListType, toList: ListType, id: string) => {
         set((state) => {
           if (fromList === toList) return; // No move needed
 
