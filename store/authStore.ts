@@ -52,14 +52,7 @@ export const useAuthStore = create<AuthState>()(
       }
 
       try {
-        const packingState = usePackingStore.getState().getCurrentState();
-
-        await saveUserPackingData(
-          userId,
-          packingState.toBuy,
-          packingState.toPack,
-          packingState.suggestions,
-        );
+        await saveUserPackingData(userId);
 
         await logout();
       } catch (error) {

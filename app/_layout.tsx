@@ -17,7 +17,6 @@ export default function RootLayout() {
   const setUser = useAuthStore((state) => state.setUser);
   const user = useAuthStore((state) => state.user);
   const replaceAllData = usePackingStore((state) => state.replaceAllData);
-  const getCurrentState = usePackingStore((state) => state.getCurrentState);
   const setLastSyncedAt = usePackingStore((state) => state.setLastSyncedAt);
 
   // Watch for Firebase login state and sync data
@@ -29,25 +28,15 @@ export default function RootLayout() {
         // Try to get Firestore data
         const cloudData = await getUserPackingData(firebaseUser.uid);
         if (cloudData) {
-          replaceAllData({
-            toBuy: cloudData.toBuy ?? [],
-            toPack: cloudData.toPack ?? [],
-            suggestions: cloudData.suggestions ?? [],
-          });
+          replaceAllData(cloudData.lists);
           setLastSyncedAt(
             cloudData.lastSyncedAt
-              ? new Date(cloudData.lastSyncedAt.seconds).getTime()
+              ? new Date(cloudData.lastSyncedAt.seconds * 1000).getTime()
               : Date.now(),
           );
         } else {
           // No data → upload local MMKV data
-          const localData = getCurrentState();
-          await saveUserPackingData(
-            firebaseUser.uid,
-            localData.toBuy,
-            localData.toPack,
-            localData.suggestions,
-          );
+          await saveUserPackingData(firebaseUser.uid);
         }
       } else {
         setUser(null);
@@ -62,8 +51,7 @@ export default function RootLayout() {
 
     const handleAppStateChange = (nextAppState: string) => {
       if (nextAppState === 'background') {
-        const currentData = getCurrentState();
-        saveUserPackingData(user, currentData.toBuy, currentData.toPack, currentData.suggestions);
+        saveUserPackingData(user);
       }
     };
 

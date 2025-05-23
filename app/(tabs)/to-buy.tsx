@@ -10,7 +10,12 @@ import { PackingItem } from '../../types/packing';
 import { v4 as uuid } from 'uuid';
 
 export default function ToBuyScreen() {
-  const { toBuy, addItem, removeItem, copyItem } = usePackingStore();
+  const { addItem, removeItem, copyItem } = usePackingStore();
+
+  const toBuy = usePackingStore((state) => {
+    const activeList = state.activeList;
+    return activeList ? state.lists[activeList].toBuy : [];
+  });
 
   const handleAdd = useCallback(
     (name: string) => {

@@ -12,12 +12,21 @@ import { getWeatherForecast } from '@/services/weather.service';
 
 export default function SuggestionsScreen() {
   const addItem = usePackingStore((state) => state.addItem);
-  const suggestions = usePackingStore((state) => state.suggestions);
+  const suggestions = usePackingStore((state) => {
+    const activeList = state.activeList;
+    return activeList ? state.lists[activeList].suggestions : [];
+  });
   const clearList = usePackingStore((state) => state.clearList);
   const copyItem = usePackingStore((state) => state.copyItem);
   const removeItem = usePackingStore((state) => state.removeItem);
-  const toBuy = usePackingStore((state) => state.toBuy);
-  const toPack = usePackingStore((state) => state.toPack);
+  const toBuy = usePackingStore((state) => {
+    const activeList = state.activeList;
+    return activeList ? state.lists[activeList].toBuy : [];
+  });
+  const toPack = usePackingStore((state) => {
+    const activeList = state.activeList;
+    return activeList ? state.lists[activeList].toPack : [];
+  });
 
   const handleGenerate = useCallback(
     async ({

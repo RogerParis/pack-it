@@ -12,7 +12,11 @@ import { v4 as uuid } from 'uuid';
 export default function ToPackScreen() {
   const { togglePacked, removeItem, copyItem, addItem } = usePackingStore();
 
-  const rawToPack = usePackingStore((state) => state.toPack);
+  const rawToPack = usePackingStore((state) => {
+    const activeList = state.activeList;
+    return activeList ? state.lists[activeList].toPack : [];
+  });
+
   const totalItems = rawToPack.length;
   const packedItems = rawToPack.filter((item) => item.packed).length;
   const progress = totalItems === 0 ? 0 : packedItems / totalItems;
@@ -45,7 +49,7 @@ export default function ToPackScreen() {
         onMoveToBuy={() => copyItem('toPack', 'toBuy', item.id)}
       />
     ),
-    [],
+    [togglePacked, removeItem, copyItem],
   );
 
   return (

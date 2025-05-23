@@ -9,103 +9,147 @@ import { immer } from 'zustand/middleware/immer';
 const storage = new MMKV();
 
 type PackingState = {
-  toBuy: PackingItem[];
-  toPack: PackingItem[];
-  suggestions: PackingItem[];
+  lists: Record<
+    string,
+    {
+      toBuy: PackingItem[];
+      toPack: PackingItem[];
+      suggestions: PackingItem[];
+    }
+  >;
+  activeList: string | null;
 
-  addItem: (list: ListType, item: PackingItem) => void;
+  createList: (name: string) => void;
+  deleteList: (name: string) => void;
+  setActiveList: (name: string) => void;
+  addItem: (type: ListType, item: PackingItem) => void;
   togglePacked: (id: string) => void;
   copyItem: (fromList: ListType, toList: ListType, id: string) => void;
-  removeItem: (list: ListType, id: string) => void;
-  clearList: (list: ListType) => void;
+  removeItem: (type: ListType, id: string) => void;
+  clearList: (type: ListType) => void;
   clearAllLists: () => void;
-
-  replaceAllData: (data: {
-    toBuy: PackingItem[];
-    toPack: PackingItem[];
-    suggestions: PackingItem[];
-  }) => void;
-  getCurrentState: () => {
-    toBuy: PackingItem[];
-    toPack: PackingItem[];
-    suggestions: PackingItem[];
-  };
-
-  lastSyncedAt: number | null; // store as timestamp (Date.now())
+  lastSyncedAt: number | null;
   setLastSyncedAt: (ts: number) => void;
+  replaceAllData: (
+    lists: Record<
+      string,
+      {
+        toBuy: PackingItem[];
+        toPack: PackingItem[];
+        suggestions: PackingItem[];
+      }
+    >,
+  ) => void;
 };
 
 export const usePackingStore = create<PackingState>()(
   persist(
-    immer((set, get) => ({
-      toBuy: [],
-      toPack: [],
-      suggestions: [],
+    immer((set) => ({
+      lists: {
+        default: { toBuy: [], toPack: [], suggestions: [] },
+      },
+      activeList: 'default',
       lastSyncedAt: null,
 
-      addItem: (list, item) => {
+      createList: (name) => {
         set((state) => {
-          (state[list] as PackingItem[]).push(item);
+          if (!state.lists[name]) {
+            state.lists[name] = { toBuy: [], toPack: [], suggestions: [] };
+          }
+        });
+      },
+
+      deleteList: (name) => {
+        set((state) => {
+          delete state.lists[name];
+          if (state.activeList === name) {
+            state.activeList = 'default';
+          }
+        });
+      },
+
+      setActiveList: (name) => {
+        set((state) => {
+          if (state.lists[name]) {
+            state.activeList = name;
+          }
+        });
+      },
+
+      addItem: (type, item) => {
+        set((state) => {
+          if (state.activeList) {
+            state.lists[state.activeList][type].push(item);
+          }
         });
       },
 
       togglePacked: (id) => {
         set((state) => {
-          const item = state.toPack.find((i) => i.id === id);
-          if (item) {
-            item.packed = !item.packed;
+          if (state.activeList) {
+            const item = state.lists[state.activeList].toPack.find((i) => i.id === id);
+            if (item) {
+              item.packed = !item.packed;
+            }
           }
         });
       },
 
-      copyItem: (fromList: ListType, toList: ListType, id: string) => {
+      copyItem: (fromList, toList, id) => {
         set((state) => {
-          if (fromList === toList) return; // No move needed
-
-          const index = state[fromList].findIndex((i) => i.id === id);
-          if (index !== -1) {
-            const [item] = state[fromList].splice(index, 1);
-            state[toList].push({ ...item, packed: false });
+          if (state.activeList && fromList !== toList) {
+            const index = state.lists[state.activeList][fromList].findIndex((i) => i.id === id);
+            if (index !== -1) {
+              const [item] = state.lists[state.activeList][fromList].splice(index, 1);
+              state.lists[state.activeList][toList].push({ ...item, packed: false });
+            }
           }
         });
       },
 
-      removeItem: (list, id) => {
+      removeItem: (type, id) => {
         set((state) => {
-          state[list] = state[list].filter((item) => item.id !== id);
+          if (state.activeList) {
+            state.lists[state.activeList][type] = state.lists[state.activeList][type].filter(
+              (item) => item.id !== id,
+            );
+          }
         });
       },
 
-      clearList: (list) => {
+      clearList: (type) => {
         set((state) => {
-          state[list] = [];
+          if (state.activeList) {
+            state.lists[state.activeList][type] = [];
+          }
         });
       },
 
       clearAllLists: () => {
         set((state) => {
-          state.toBuy = [];
-          state.toPack = [];
-          state.suggestions = [];
+          state.lists = { default: { toBuy: [], toPack: [], suggestions: [] } };
+          state.activeList = 'default';
         });
-      },
-
-      replaceAllData: (data) => {
-        set((state) => {
-          state.toBuy = data.toBuy ?? [];
-          state.toPack = data.toPack ?? [];
-          state.suggestions = data.suggestions ?? [];
-        });
-      },
-
-      getCurrentState: () => {
-        const { toBuy, toPack, suggestions } = get();
-        return { toBuy, toPack, suggestions };
       },
 
       setLastSyncedAt: (ts) => {
         set((state) => {
           state.lastSyncedAt = ts;
+        });
+      },
+
+      replaceAllData: (
+        lists: Record<
+          string,
+          {
+            toBuy: PackingItem[];
+            toPack: PackingItem[];
+            suggestions: PackingItem[];
+          }
+        >,
+      ) => {
+        set((state) => {
+          state.lists = lists;
         });
       },
     })),

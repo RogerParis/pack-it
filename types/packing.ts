@@ -20,7 +20,12 @@ export type FirestoreTimestamp = {
 export type CloudPackingData = {
   schemaVersion: number;
   lastSyncedAt: FirestoreTimestamp;
-  toBuy: PackingItem[];
-  toPack: PackingItem[];
-  suggestions: PackingItem[];
+  lists: Record<
+    string,
+    {
+      toBuy: PackingItem[];
+      toPack: PackingItem[];
+      suggestions: PackingItem[];
+    }
+  >;
 };
