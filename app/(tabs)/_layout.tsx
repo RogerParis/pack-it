@@ -4,12 +4,16 @@ import { Tabs, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useAuthStore } from '@/store/authStore';
+import { usePackingStore } from '@/store/packingStore';
 import { COLORS } from '@/theme/colors';
 
 export default function TabLayout() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
-
+  const activeListName = usePackingStore((state) => {
+    const activeList = state.activeList;
+    return activeList ? state.lists[activeList].name : 'Default List';
+  });
   return (
     <Tabs
       screenOptions={{
@@ -27,13 +31,12 @@ export default function TabLayout() {
             />
           </Pressable>
         ),
-
         headerShown: true,
+        headerTitle: activeListName,
       }}>
       <Tabs.Screen
         name="to-pack"
         options={{
-          title: '🎒 To Pack',
           tabBarLabel: 'To Pack',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="briefcase-outline" size={size} color={color} />
@@ -43,7 +46,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="to-buy"
         options={{
-          title: '🛒 To Buy',
           tabBarLabel: 'To Buy',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="cart-outline" size={size} color={color} />
@@ -53,7 +55,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="suggestions"
         options={{
-          title: '🤖 AI Suggestions',
           tabBarLabel: 'Suggestions',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="sparkles-outline" size={size} color={color} />
