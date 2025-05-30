@@ -1,12 +1,13 @@
 import React, { useCallback, useState } from 'react';
 import {
-  Button,
   FlatList,
   Modal,
   Pressable,
+  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 
@@ -23,11 +24,12 @@ export default function ProfileScreen() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const signOut = useAuthStore((state) => state.signOut);
+
   const lastSyncedAt = usePackingStore((state) => state.lastSyncedAt);
   const createList = usePackingStore((state) => state.createList);
   const setActiveList = usePackingStore((state) => state.setActiveList);
-  const lists = usePackingStore((state) => state.lists);
   const activeList = usePackingStore((state) => state.activeList);
+  const lists = usePackingStore((state) => state.lists);
 
   const [newListName, setNewListName] = useState('');
   const [isPickerVisible, setPickerVisible] = useState(false);
@@ -37,19 +39,20 @@ export default function ProfileScreen() {
   }, [router]);
 
   const handleSync = useCallback(() => {
-    saveUserPackingData(user!);
+    if (user) saveUserPackingData(user);
   }, [user]);
 
   const handleCreateList = useCallback(() => {
-    if (newListName.trim()) {
-      createList(newListName.trim());
-      setNewListName('');
-    }
+    const trimmed = newListName.trim();
+    if (!trimmed) return;
+
+    createList(trimmed);
+    setNewListName('');
   }, [newListName, createList]);
 
   const handleSelectList = useCallback(
-    (listName: string) => {
-      setActiveList(listName);
+    (listId: string) => {
+      setActiveList(listId);
       setPickerVisible(false);
       router.push('/(tabs)/to-pack');
     },
@@ -59,83 +62,156 @@ export default function ProfileScreen() {
   const listKeys = Object.keys(lists);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.syncLabel}>{getSyncLabel(lastSyncedAt)}</Text>
+    <SafeAreaView style={styles.screen}>
+      <View style={styles.container}>
+        <Text style={styles.title}>👤 Profile</Text>
 
-      {!user ? (
-        <Button title="Log In" onPress={handleLogin} />
-      ) : (
-        <>
-          <Text style={styles.loggedInText}>Logged in as: {user}</Text>
-          <Button title="Sync Now" onPress={handleSync} />
-          <Button title="Log Out" onPress={signOut} />
-        </>
-      )}
-      <Text style={{ marginBottom: 12 }}>
-        {'Current List: '}
-        <Text style={{ fontWeight: 'bold' }}>
-          {lists[Object.keys(lists).find((key) => key === activeList)!].name}
-        </Text>
-      </Text>
-      <TextInput
-        style={styles.input}
-        placeholder="New List Name"
-        value={newListName}
-        onChangeText={setNewListName}
-      />
-      <Button title="Create List" onPress={handleCreateList} />
+        <View style={styles.card}>
+          <Text style={styles.label}>Status</Text>
+          <Text style={styles.sync}>{getSyncLabel(lastSyncedAt)}</Text>
+          {user ? (
+            <Text style={styles.subtext}>Logged in as: {user}</Text>
+          ) : (
+            <Text style={styles.subtext}>Using app as guest</Text>
+          )}
+        </View>
 
-      <Button title="Select List" onPress={() => setPickerVisible(true)} />
+        <View style={styles.card}>
+          <Text style={styles.label}>Active List: </Text>
+          <Text style={styles.listName}>
+            {lists[Object.keys(lists).find((key) => key === activeList)!].name}
+          </Text>
+          <TouchableOpacity onPress={() => setPickerVisible(true)} style={styles.buttonSecondary}>
+            <Text style={styles.buttonText}>Select Another List</Text>
+          </TouchableOpacity>
+        </View>
 
-      <Modal visible={isPickerVisible} animationType="slide" transparent>
+        <View style={styles.card}>
+          <Text style={styles.label}>Create New List</Text>
+          <View style={styles.inputRow}>
+            <TextInput
+              placeholder="New list name"
+              value={newListName}
+              onChangeText={setNewListName}
+              style={styles.input}
+            />
+            <TouchableOpacity onPress={handleCreateList} style={styles.button}>
+              <Text style={styles.buttonText}>Add</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.card}>
+          <TouchableOpacity onPress={handleSync} style={styles.button}>
+            <Text style={styles.buttonText}>Sync Now</Text>
+          </TouchableOpacity>
+
+          {user ? (
+            <TouchableOpacity onPress={signOut} style={[styles.button, styles.logoutButton]}>
+              <Text style={styles.buttonText}>Log Out</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={handleLogin} style={styles.button}>
+              <Text style={styles.buttonText}>Log In / Register</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
+      <Modal visible={isPickerVisible} transparent animationType="slide">
         <View style={styles.overlay}>
           <View style={styles.modal}>
             <Text style={styles.modalTitle}>Select Packing List</Text>
-
             <FlatList
               data={listKeys}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
                 <Pressable
-                  style={[styles.modalListItem, item === activeList && styles.modalListItemActive]}
+                  style={[styles.modalItem, item === activeList && styles.modalItemActive]}
                   onPress={() => handleSelectList(item)}>
-                  <Text style={styles.modalListItemText}>
+                  <Text style={styles.modalItemText}>
                     {lists[item].name} {item === activeList ? '✅' : ''}
                   </Text>
                 </Pressable>
               )}
-              contentContainerStyle={{ paddingVertical: 8 }}
             />
-
-            <Button title="Close" onPress={() => setPickerVisible(false)} />
+            <TouchableOpacity onPress={() => setPickerVisible(false)} style={styles.button}>
+              <Text style={styles.buttonText}>Close</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  loggedInText: { marginVertical: 16 },
-  syncLabel: {
+  screen: { flex: 1, backgroundColor: '#fff' },
+  container: {
+    flex: 1,
+    padding: 20,
+    gap: 24,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
     textAlign: 'center',
+  },
+  card: {
+    backgroundColor: '#F2F2F2',
+    padding: 16,
+    borderRadius: 12,
+    gap: 12,
+  },
+  label: {
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  sync: {
     color: COLORS.neutral500,
-    fontSize: 13,
-    marginBottom: 16,
+  },
+  subtext: {
+    fontSize: 14,
+    color: COLORS.neutral500,
+  },
+  listName: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  inputRow: {
+    flexDirection: 'row',
+    gap: 8,
   },
   input: {
-    borderWidth: 1,
+    flex: 1,
     borderColor: COLORS.neutral300,
-    padding: 8,
-    marginVertical: 8,
-    width: '80%',
+    borderWidth: 1,
+    padding: 12,
+    borderRadius: 6,
+  },
+  button: {
+    backgroundColor: COLORS.primary,
+    padding: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  buttonSecondary: {
+    backgroundColor: COLORS.neutral300,
+    padding: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  logoutButton: {
+    backgroundColor: COLORS.error,
+  },
+  buttonText: {
+    color: COLORS.white,
+    fontWeight: '600',
   },
   overlay: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
   },
   modal: {
     backgroundColor: 'white',
@@ -143,23 +219,23 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '80%',
+    gap: 12,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 16,
     textAlign: 'center',
+    marginBottom: 12,
   },
-  modalListItem: {
+  modalItem: {
     padding: 14,
     borderRadius: 8,
-    backgroundColor: COLORS.neutral200,
-    marginBottom: 8,
+    backgroundColor: '#F2F2F2',
   },
-  modalListItemActive: {
+  modalItemActive: {
     backgroundColor: COLORS.primary,
   },
-  modalListItemText: {
+  modalItemText: {
     fontSize: 16,
     color: COLORS.text,
   },
