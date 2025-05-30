@@ -14,6 +14,7 @@ type PackingState = {
   activeList: string | null;
 
   createList: (name: string) => string;
+  renameList: (id: string, newName: string) => void;
   deleteList: (name: string) => void;
   setActiveList: (name: string) => void;
   addItem: (type: ListType, item: PackingItem) => void;
@@ -42,6 +43,14 @@ export const usePackingStore = create<PackingState>()(
           state.lists[id] = { name, toBuy: [], toPack: [], suggestions: [] };
         });
         return id;
+      },
+
+      renameList: (id, newName) => {
+        set((state) => {
+          if (state.lists[id]) {
+            state.lists[id].name = newName;
+          }
+        });
       },
 
       deleteList: (id) => {
