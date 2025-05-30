@@ -27,6 +27,7 @@ export default function ProfileScreen() {
   const createList = usePackingStore((state) => state.createList);
   const setActiveList = usePackingStore((state) => state.setActiveList);
   const lists = usePackingStore((state) => state.lists);
+  const activeList = usePackingStore((state) => state.activeList);
 
   const [newListName, setNewListName] = useState('');
   const [isPickerVisible, setPickerVisible] = useState(false);
@@ -69,6 +70,12 @@ export default function ProfileScreen() {
           <Button title="Log Out" onPress={signOut} />
         </>
       )}
+      <Text style={{ marginBottom: 12 }}>
+        Current List:
+        <Text style={{ fontWeight: 'bold' }}>
+          {lists[Object.keys(lists).find((key) => lists[key])!].name}
+        </Text>
+      </Text>
       <TextInput
         style={styles.input}
         placeholder="New List Name"
@@ -85,8 +92,12 @@ export default function ProfileScreen() {
             data={listKeys}
             keyExtractor={(item) => item}
             renderItem={({ item }) => (
-              <TouchableOpacity style={styles.listItem} onPress={() => handleSelectList(item)}>
-                <Text style={styles.listItemText}>{lists[item].name}</Text>
+              <TouchableOpacity
+                style={[styles.listItem, item === activeList && styles.activeListItem]}
+                onPress={() => handleSelectList(item)}>
+                <Text style={styles.listItemText}>
+                  {lists[item].name} {item === activeList ? '✅' : ''}
+                </Text>
               </TouchableOpacity>
             )}
           />
@@ -132,5 +143,8 @@ const styles = StyleSheet.create({
   },
   listItemText: {
     fontSize: 16,
+  },
+  activeListItem: {
+    backgroundColor: COLORS.primary,
   },
 });
