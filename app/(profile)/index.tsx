@@ -3,10 +3,10 @@ import {
   Button,
   FlatList,
   Modal,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native';
 
@@ -51,8 +51,9 @@ export default function ProfileScreen() {
     (listName: string) => {
       setActiveList(listName);
       setPickerVisible(false);
+      router.push('/(tabs)/to-pack');
     },
-    [setActiveList, setPickerVisible],
+    [setActiveList, setPickerVisible, router],
   );
 
   const listKeys = Object.keys(lists);
@@ -71,9 +72,9 @@ export default function ProfileScreen() {
         </>
       )}
       <Text style={{ marginBottom: 12 }}>
-        Current List:
+        {'Current List: '}
         <Text style={{ fontWeight: 'bold' }}>
-          {lists[Object.keys(lists).find((key) => lists[key])!].name}
+          {lists[Object.keys(lists).find((key) => key === activeList)!].name}
         </Text>
       </Text>
       <TextInput
@@ -86,22 +87,28 @@ export default function ProfileScreen() {
 
       <Button title="Select List" onPress={() => setPickerVisible(true)} />
 
-      <Modal visible={isPickerVisible} transparent={true} animationType="slide">
-        <View style={styles.modalContainer}>
-          <FlatList
-            data={listKeys}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={[styles.listItem, item === activeList && styles.activeListItem]}
-                onPress={() => handleSelectList(item)}>
-                <Text style={styles.listItemText}>
-                  {lists[item].name} {item === activeList ? '✅' : ''}
-                </Text>
-              </TouchableOpacity>
-            )}
-          />
-          <Button title="Close" onPress={() => setPickerVisible(false)} />
+      <Modal visible={isPickerVisible} animationType="slide" transparent>
+        <View style={styles.overlay}>
+          <View style={styles.modal}>
+            <Text style={styles.modalTitle}>Select Packing List</Text>
+
+            <FlatList
+              data={listKeys}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <Pressable
+                  style={[styles.modalListItem, item === activeList && styles.modalListItemActive]}
+                  onPress={() => handleSelectList(item)}>
+                  <Text style={styles.modalListItemText}>
+                    {lists[item].name} {item === activeList ? '✅' : ''}
+                  </Text>
+                </Pressable>
+              )}
+              contentContainerStyle={{ paddingVertical: 8 }}
+            />
+
+            <Button title="Close" onPress={() => setPickerVisible(false)} />
+          </View>
         </View>
       </Modal>
     </View>
@@ -125,26 +132,35 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     width: '80%',
   },
-  modalContainer: {
+  overlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    paddingHorizontal: 16, // Added padding to ensure proper centering
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
-  listItem: {
-    padding: 16,
+  modal: {
     backgroundColor: 'white',
-    marginVertical: 4,
-    width: '90%', // Adjusted to ensure full width of list names is shown
-    alignItems: 'center',
-    alignSelf: 'center', // Center the list items horizontally
-    textAlign: 'center', // Ensures text is centered within the list item
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '80%',
   },
-  listItemText: {
-    fontSize: 16,
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 16,
+    textAlign: 'center',
   },
-  activeListItem: {
+  modalListItem: {
+    padding: 14,
+    borderRadius: 8,
+    backgroundColor: COLORS.neutral200,
+    marginBottom: 8,
+  },
+  modalListItemActive: {
     backgroundColor: COLORS.primary,
+  },
+  modalListItemText: {
+    fontSize: 16,
+    color: COLORS.text,
   },
 });
