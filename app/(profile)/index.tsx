@@ -2,7 +2,6 @@ import React, { useCallback, useState } from 'react';
 import {
   FlatList,
   Modal,
-  Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -49,6 +48,7 @@ export default function ProfileScreen() {
     const newId = createList(trimmed);
     setNewListName('');
     setActiveList(newId);
+    handleSync();
     router.push('/(tabs)/to-pack');
   }, [newListName, createList, lists, setActiveList, router]);
 
@@ -128,13 +128,13 @@ export default function ProfileScreen() {
               data={listKeys}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
-                <Pressable
+                <TouchableOpacity
                   style={[styles.modalItem, item === activeList && styles.modalItemActive]}
                   onPress={() => handleSelectList(item)}>
                   <Text style={styles.modalItemText}>
                     {lists[item].name} {item === activeList ? '✅' : ''}
                   </Text>
-                </Pressable>
+                </TouchableOpacity>
               )}
             />
             <TouchableOpacity onPress={() => setPickerVisible(false)} style={styles.button}>
