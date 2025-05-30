@@ -13,7 +13,7 @@ type PackingState = {
   lists: PackingListDataRecord;
   activeList: string | null;
 
-  createList: (name: string) => void;
+  createList: (name: string) => string;
   deleteList: (name: string) => void;
   setActiveList: (name: string) => void;
   addItem: (type: ListType, item: PackingItem) => void;
@@ -37,10 +37,11 @@ export const usePackingStore = create<PackingState>()(
       lastSyncedAt: null,
 
       createList: (name) => {
+        const id = uuidv4();
         set((state) => {
-          const id = uuidv4();
           state.lists[id] = { name, toBuy: [], toPack: [], suggestions: [] };
         });
+        return id;
       },
 
       deleteList: (id) => {

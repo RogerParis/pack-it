@@ -46,9 +46,11 @@ export default function ProfileScreen() {
     const trimmed = newListName.trim();
     if (!trimmed) return;
 
-    createList(trimmed);
+    const newId = createList(trimmed);
     setNewListName('');
-  }, [newListName, createList]);
+    setActiveList(newId);
+    router.push('/(tabs)/to-pack');
+  }, [newListName, createList, lists, setActiveList, router]);
 
   const handleSelectList = useCallback(
     (listId: string) => {
