@@ -8,9 +8,10 @@ export type ListType = 'toBuy' | 'toPack' | 'suggestions';
 
 export type PackingListData = {
   name: string;
-  toBuy: PackingItem[];
   toPack: PackingItem[];
+  toBuy: PackingItem[];
   suggestions: PackingItem[];
+  sharedWith: string[];
 };
 
 export type PackingListDataRecord = Record<string, PackingListData>;

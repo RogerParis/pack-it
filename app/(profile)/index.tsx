@@ -4,6 +4,7 @@ import {
   FlatList,
   Modal,
   SafeAreaView,
+  ScrollView, // <-- Add ScrollView
   StyleSheet,
   Text,
   TextInput,
@@ -31,11 +32,19 @@ export default function ProfileScreen() {
   const deleteList = usePackingStore((state) => state.deleteList);
   const activeList = usePackingStore((state) => state.activeList);
   const lists = usePackingStore((state) => state.lists);
+  const addCollaborator = usePackingStore((state) => state.addCollaborator);
 
   const [newListName, setNewListName] = useState('');
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [renaming, setRenaming] = useState<string | null>(null);
   const [renameText, setRenameText] = useState('');
+  const [collaboratorUid, setCollaboratorUid] = useState('');
+
+  const handleAddCollaborator = useCallback(() => {
+    if (!activeList || !collaboratorUid.trim()) return;
+    addCollaborator(activeList, collaboratorUid.trim());
+    setCollaboratorUid('');
+  }, [activeList, collaboratorUid]);
 
   const handleLogin = useCallback(() => {
     router.push('/login');
@@ -97,64 +106,89 @@ export default function ProfileScreen() {
   };
 
   const listKeys = Object.keys(lists);
+  const activePackingList = lists[Object.keys(lists).find((key) => key === activeList)!];
 
   return (
     <SafeAreaView style={styles.screen}>
-      <View style={styles.container}>
-        <Text style={styles.title}>👤 Profile</Text>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          <View style={styles.card}>
+            <Text style={styles.label}>Status</Text>
+            <Text style={styles.sync}>{getSyncLabel(lastSyncedAt)}</Text>
+            {user ? (
+              <Text style={styles.subtext}>Logged in as: {user}</Text>
+            ) : (
+              <Text style={styles.subtext}>Using app as guest</Text>
+            )}
+          </View>
 
-        <View style={styles.card}>
-          <Text style={styles.label}>Status</Text>
-          <Text style={styles.sync}>{getSyncLabel(lastSyncedAt)}</Text>
-          {user ? (
-            <Text style={styles.subtext}>Logged in as: {user}</Text>
-          ) : (
-            <Text style={styles.subtext}>Using app as guest</Text>
-          )}
-        </View>
+          <View style={styles.card}>
+            <Text style={styles.label}>Active List: </Text>
+            <Text style={styles.listName}>{activePackingList.name}</Text>
+            <Text style={styles.label}>Share This List</Text>
+            <View style={styles.inputRow}>
+              <TextInput
+                placeholder="Collaborator UID"
+                value={collaboratorUid}
+                onChangeText={setCollaboratorUid}
+                style={styles.input}
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="done"
+                onSubmitEditing={handleAddCollaborator}
+              />
+              <TouchableOpacity onPress={handleAddCollaborator} style={styles.button}>
+                <Text style={styles.buttonText}>Add</Text>
+              </TouchableOpacity>
+            </View>
 
-        <View style={styles.card}>
-          <Text style={styles.label}>Active List: </Text>
-          <Text style={styles.listName}>
-            {lists[Object.keys(lists).find((key) => key === activeList)!].name}
-          </Text>
-          <TouchableOpacity onPress={() => setPickerVisible(true)} style={styles.buttonAlt}>
-            <Text style={styles.buttonText}>Select Another List</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.label}>Create New List</Text>
-          <View style={styles.inputRow}>
-            <TextInput
-              placeholder="New list name"
-              value={newListName}
-              onChangeText={setNewListName}
-              style={styles.input}
-            />
-            <TouchableOpacity onPress={handleCreateList} style={styles.button}>
-              <Text style={styles.buttonText}>Add</Text>
+            <Text style={styles.label}>Shared With:</Text>
+            {activePackingList?.sharedWith?.length ? (
+              activePackingList.sharedWith.map((uid) => (
+                <Text key={uid} style={styles.subtext}>
+                  👥 {uid}
+                </Text>
+              ))
+            ) : (
+              <Text style={styles.subtext}>No collaborators</Text>
+            )}
+            <TouchableOpacity onPress={() => setPickerVisible(true)} style={styles.buttonAlt}>
+              <Text style={styles.buttonText}>Select Another List</Text>
             </TouchableOpacity>
           </View>
-        </View>
 
-        <View style={styles.card}>
-          <TouchableOpacity onPress={handleSync} style={styles.button}>
-            <Text style={styles.buttonText}>Sync Now</Text>
-          </TouchableOpacity>
+          <View style={styles.card}>
+            <Text style={styles.label}>Create New List</Text>
+            <View style={styles.inputRow}>
+              <TextInput
+                placeholder="New list name"
+                value={newListName}
+                onChangeText={setNewListName}
+                style={styles.input}
+              />
+              <TouchableOpacity onPress={handleCreateList} style={styles.button}>
+                <Text style={styles.buttonText}>Add</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-          {user ? (
-            <TouchableOpacity onPress={signOut} style={[styles.button, styles.logoutButton]}>
-              <Text style={styles.buttonText}>Log Out</Text>
+          <View style={styles.card}>
+            <TouchableOpacity onPress={handleSync} style={styles.button}>
+              <Text style={styles.buttonText}>Sync Now</Text>
             </TouchableOpacity>
-          ) : (
-            <TouchableOpacity onPress={handleLogin} style={styles.button}>
-              <Text style={styles.buttonText}>Log In / Register</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
 
+            {user ? (
+              <TouchableOpacity onPress={signOut} style={[styles.button, styles.logoutButton]}>
+                <Text style={styles.buttonText}>Log Out</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={handleLogin} style={styles.button}>
+                <Text style={styles.buttonText}>Log In / Register</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      </ScrollView>
       <Modal visible={isPickerVisible} transparent animationType="slide">
         <View style={styles.overlay}>
           <View style={styles.modal}>
@@ -217,8 +251,8 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#fff' },
+  scrollContainer: { flexGrow: 1 },
   container: { flex: 1, padding: 20, gap: 24 },
-  title: { fontSize: 22, fontWeight: 'bold', textAlign: 'center' },
   card: {
     backgroundColor: '#F2F2F2',
     padding: 16,

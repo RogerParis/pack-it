@@ -12,6 +12,7 @@ const storage = new MMKV();
 type PackingState = {
   lists: PackingListDataRecord;
   activeList: string | null;
+  lastSyncedAt: number | null;
 
   createList: (name: string) => string;
   renameList: (id: string, newName: string) => void;
@@ -23,16 +24,16 @@ type PackingState = {
   removeItem: (type: ListType, id: string) => void;
   clearList: (type: ListType) => void;
   clearAllLists: () => void;
-  lastSyncedAt: number | null;
   setLastSyncedAt: (ts: number) => void;
   replaceAllData: (lists: PackingListDataRecord) => void;
+  addCollaborator: (listId: string, uid: string) => void;
 };
 
 export const usePackingStore = create<PackingState>()(
   persist(
     immer((set) => ({
       lists: {
-        default: { name: 'Default', toBuy: [], toPack: [], suggestions: [] },
+        default: { name: 'Default', toBuy: [], toPack: [], suggestions: [], sharedWith: [] },
       },
       activeList: 'default',
       lastSyncedAt: null,
@@ -40,7 +41,7 @@ export const usePackingStore = create<PackingState>()(
       createList: (name) => {
         const id = uuidv4();
         set((state) => {
-          state.lists[id] = { name, toBuy: [], toPack: [], suggestions: [] };
+          state.lists[id] = { name, toBuy: [], toPack: [], suggestions: [], sharedWith: [] };
         });
         return id;
       },
@@ -121,7 +122,9 @@ export const usePackingStore = create<PackingState>()(
 
       clearAllLists: () => {
         set((state) => {
-          state.lists = { default: { name: 'Default', toBuy: [], toPack: [], suggestions: [] } };
+          state.lists = {
+            default: { name: 'Default', toBuy: [], toPack: [], suggestions: [], sharedWith: [] },
+          };
           state.activeList = 'default';
         });
       },
@@ -135,6 +138,18 @@ export const usePackingStore = create<PackingState>()(
       replaceAllData: (lists: PackingListDataRecord) => {
         set((state) => {
           state.lists = lists;
+        });
+      },
+
+      addCollaborator: (listId, uid) => {
+        set((state) => {
+          const list = state.lists[listId];
+          if (list) {
+            list.sharedWith = list.sharedWith || [];
+            if (!list.sharedWith.includes(uid)) {
+              list.sharedWith.push(uid);
+            }
+          }
         });
       },
     })),
