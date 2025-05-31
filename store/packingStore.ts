@@ -27,6 +27,7 @@ type PackingState = {
   setLastSyncedAt: (ts: number) => void;
   replaceAllData: (lists: PackingListDataRecord) => void;
   addCollaborator: (listId: string, uid: string) => void;
+  removeCollaborator: (listId: string, uid: string) => void;
 };
 
 export const usePackingStore = create<PackingState>()(
@@ -149,6 +150,15 @@ export const usePackingStore = create<PackingState>()(
             if (!list.sharedWith.includes(uid)) {
               list.sharedWith.push(uid);
             }
+          }
+        });
+      },
+
+      removeCollaborator: (listId, uid) => {
+        set((state) => {
+          const list = state.lists[listId];
+          if (list && list.sharedWith) {
+            list.sharedWith = list.sharedWith.filter((id) => id !== uid);
           }
         });
       },

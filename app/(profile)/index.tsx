@@ -4,7 +4,7 @@ import {
   FlatList,
   Modal,
   SafeAreaView,
-  ScrollView, // <-- Add ScrollView
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -33,6 +33,7 @@ export default function ProfileScreen() {
   const activeList = usePackingStore((state) => state.activeList);
   const lists = usePackingStore((state) => state.lists);
   const addCollaborator = usePackingStore((state) => state.addCollaborator);
+  const removeCollaborator = usePackingStore((state) => state.removeCollaborator);
 
   const [newListName, setNewListName] = useState('');
   const [isPickerVisible, setPickerVisible] = useState(false);
@@ -105,6 +106,14 @@ export default function ProfileScreen() {
     ]);
   };
 
+  const handleRemoveCollaborator = useCallback(
+    (uid: string) => {
+      if (!activeList) return;
+      removeCollaborator(activeList, uid);
+    },
+    [activeList, removeCollaborator],
+  );
+
   const listKeys = Object.keys(lists);
   const activePackingList = lists[Object.keys(lists).find((key) => key === activeList)!];
 
@@ -145,9 +154,14 @@ export default function ProfileScreen() {
             <Text style={styles.label}>Shared With:</Text>
             {activePackingList?.sharedWith?.length ? (
               activePackingList.sharedWith.map((uid) => (
-                <Text key={uid} style={styles.subtext}>
-                  👥 {uid}
-                </Text>
+                <View key={uid} style={styles.collaboratorRow}>
+                  <Text style={styles.subtext}>👥 {uid}</Text>
+                  <TouchableOpacity
+                    onPress={() => handleRemoveCollaborator(uid)}
+                    style={styles.removeCollaboratorButton}>
+                    <Text style={styles.removeCollaboratorText}>✖️</Text>
+                  </TouchableOpacity>
+                </View>
               ))
             ) : (
               <Text style={styles.subtext}>No collaborators</Text>
@@ -339,5 +353,23 @@ const styles = StyleSheet.create({
   },
   action: {
     fontSize: 18,
+  },
+  collaboratorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  removeCollaboratorButton: {
+    marginLeft: 8,
+    padding: 4,
+    borderRadius: 4,
+    backgroundColor: COLORS.error,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  removeCollaboratorText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
