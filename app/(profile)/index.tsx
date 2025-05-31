@@ -20,6 +20,7 @@ import { saveUserPackingData } from '@/services/cloud.service';
 import { useAuthStore } from '@/store/authStore';
 import { usePackingStore } from '@/store/packingStore';
 import { COLORS } from '@/theme/colors';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -40,6 +41,7 @@ export default function ProfileScreen() {
   const [renaming, setRenaming] = useState<string | null>(null);
   const [renameText, setRenameText] = useState('');
   const [collaboratorUid, setCollaboratorUid] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const handleAddCollaborator = useCallback(() => {
     if (!activeList || !collaboratorUid.trim()) return;
@@ -114,6 +116,14 @@ export default function ProfileScreen() {
     [activeList, removeCollaborator],
   );
 
+  const handleCopyUid = useCallback(() => {
+    if (user) {
+      Clipboard.setString(user);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
+  }, [user]);
+
   const listKeys = Object.keys(lists);
   const activePackingList = lists[Object.keys(lists).find((key) => key === activeList)!];
 
@@ -125,14 +135,22 @@ export default function ProfileScreen() {
             <Text style={styles.label}>Status</Text>
             <Text style={styles.sync}>{getSyncLabel(lastSyncedAt)}</Text>
             {user ? (
-              <Text style={styles.subtext}>Logged in as: {user}</Text>
+              <View style={styles.uidRow}>
+                <Text style={styles.subtext}>Logged in as: {user}</Text>
+                <TouchableOpacity
+                  onPress={handleCopyUid}
+                  style={styles.copyButton}
+                  accessibilityLabel="Copy UID">
+                  <Text style={styles.copyIcon}>📋</Text>
+                </TouchableOpacity>
+                {copied && <Text style={styles.copiedText}>Copied!</Text>}
+              </View>
             ) : (
               <Text style={styles.subtext}>Using app as guest</Text>
             )}
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.label}>Active List: </Text>
             <Text style={styles.listName}>{activePackingList.name}</Text>
             <Text style={styles.label}>Share This List</Text>
             <View style={styles.inputRow}>
@@ -275,7 +293,12 @@ const styles = StyleSheet.create({
   },
   label: { fontWeight: '600', fontSize: 16 },
   sync: { color: COLORS.neutral500 },
-  subtext: { fontSize: 14, color: COLORS.neutral500 },
+  subtext: {
+    fontSize: 14,
+    color: COLORS.neutral500,
+    maxWidth: '80%',
+    flexShrink: 1,
+  },
   listName: { fontSize: 18, fontWeight: '600' },
   inputRow: { flexDirection: 'row', gap: 8 },
   input: {
@@ -371,5 +394,29 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  uidRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  copyButton: {
+    marginLeft: 8,
+    padding: 4,
+    borderRadius: 4,
+    backgroundColor: COLORS.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  copyIcon: {
+    fontSize: 16,
+    color: COLORS.text,
+  },
+  copiedText: {
+    marginLeft: 8,
+    color: COLORS.primary,
+    fontSize: 13,
+    fontWeight: '600',
   },
 });
