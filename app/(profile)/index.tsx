@@ -101,8 +101,6 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.screen}>
       <View style={styles.container}>
-        <Text style={styles.title}>👤 Profile</Text>
-
         <View style={styles.card}>
           <Text style={styles.label}>Status</Text>
           <Text style={styles.sync}>{getSyncLabel(lastSyncedAt)}</Text>
@@ -218,7 +216,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#fff' },
   container: { flex: 1, padding: 20, gap: 24 },
-  title: { fontSize: 22, fontWeight: 'bold', textAlign: 'center' },
   card: {
     backgroundColor: '#F2F2F2',
     padding: 16,
