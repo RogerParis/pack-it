@@ -161,7 +161,7 @@ export default function ProfileScreen() {
               data={listKeys}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
-                <View style={styles.modalItem}>
+                <View style={[styles.modalItem, item === activeList && styles.modalItemActive]}>
                   {renaming === item ? (
                     <View style={styles.renameRow}>
                       <TextInput
@@ -178,10 +178,10 @@ export default function ProfileScreen() {
                       </TouchableOpacity>
                     </View>
                   ) : (
-                    <>
+                    <View style={styles.modalItemWrapper}>
                       <TouchableOpacity
                         onPress={() => handleSelectList(item)}
-                        style={[styles.selectRow, item === activeList && styles.modalItemActive]}>
+                        style={[styles.selectRow]}>
                         <Text style={styles.modalItemText}>
                           {lists[item].name} {item === activeList ? '✅' : ''}
                         </Text>
@@ -198,7 +198,7 @@ export default function ProfileScreen() {
                           <Text style={styles.action}>🗑️</Text>
                         </TouchableOpacity>
                       </View>
-                    </>
+                    </View>
                   )}
                 </View>
               )}
@@ -272,11 +272,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 12,
   },
+  modalItemWrapper: { flexDirection: 'row', alignItems: 'center' },
   modalItem: {
     padding: 12,
     backgroundColor: '#F2F2F2',
     borderRadius: 10,
     marginBottom: 8,
+    alignItems: 'center',
   },
   modalItemActive: {
     backgroundColor: COLORS.primary,
@@ -284,23 +286,23 @@ const styles = StyleSheet.create({
   modalItemText: {
     fontSize: 16,
     color: COLORS.text,
+    verticalAlign: 'middle',
   },
   actionsRow: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 10,
     marginTop: 6,
   },
   selectRow: {
+    flex: 1,
     padding: 6,
     borderRadius: 8,
   },
   renameRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     gap: 10,
   },
   action: {
     fontSize: 18,
+    padding: 10,
   },
 });
