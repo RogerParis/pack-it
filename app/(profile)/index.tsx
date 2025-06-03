@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 
 import { useRouter } from 'expo-router';
 
@@ -29,6 +30,7 @@ export default function ProfileScreen() {
   const setActiveList = usePackingStore((state) => state.setActiveList);
   const renameList = usePackingStore((state) => state.renameList);
   const deleteList = usePackingStore((state) => state.deleteList);
+  const mergeList = usePackingStore((state) => state.mergeList);
   const activeList = usePackingStore((state) => state.activeList);
   const lists = usePackingStore((state) => state.lists);
 
@@ -94,6 +96,27 @@ export default function ProfileScreen() {
         },
       },
     ]);
+  };
+
+  const handleMergeList = (id: string) => {
+    if (id === activeList) {
+      return; // Should never happen as we hide the merge button for active list
+    }
+
+    Alert.alert(
+      'Merge List',
+      `Are you sure you want to merge "${lists[id].name}" into your active list "${lists[activeList!].name}"?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Merge',
+          onPress: () => {
+            mergeList(id);
+            Alert.alert('Success', 'List merged successfully!');
+          },
+        },
+      ]
+    );
   };
 
   const listKeys = Object.keys(lists);
@@ -188,14 +211,24 @@ export default function ProfileScreen() {
                       </TouchableOpacity>
                       <View style={styles.actionsRow}>
                         <TouchableOpacity
+                          style={styles.actionButton}
                           onPress={() => {
                             setRenaming(item);
                             setRenameText(lists[item].name);
                           }}>
-                          <Text style={styles.action}>✏️</Text>
+                          <Feather name="edit-2" size={18} style={styles.actionIcon} />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleDeleteList(item)}>
-                          <Text style={styles.action}>🗑️</Text>
+                        {item !== activeList && (
+                          <TouchableOpacity 
+                            style={styles.actionButton}
+                            onPress={() => handleMergeList(item)}>
+                            <Feather name="git-merge" size={18} style={styles.actionIcon} />
+                          </TouchableOpacity>
+                        )}
+                        <TouchableOpacity 
+                          style={styles.actionButton}
+                          onPress={() => handleDeleteList(item)}>
+                          <Feather name="trash-2" size={18} style={styles.actionIcon} />
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -291,6 +324,7 @@ const styles = StyleSheet.create({
   actionsRow: {
     flexDirection: 'row',
     marginTop: 6,
+    alignItems: 'center',
   },
   selectRow: {
     flex: 1,
@@ -301,8 +335,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
   },
-  action: {
-    fontSize: 18,
-    padding: 10,
+  actionButton: {
+    padding: 6,
+    borderRadius: 4,
+    marginHorizontal: 2,
+  },
+  actionIcon: {
+    padding: 4,
+    color: COLORS.text,
   },
 });

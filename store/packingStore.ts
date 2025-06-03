@@ -17,6 +17,7 @@ type PackingState = {
   renameList: (id: string, newName: string) => void;
   deleteList: (name: string) => void;
   setActiveList: (name: string) => void;
+  mergeList: (sourceId: string) => void;
   addItem: (type: ListType, item: PackingItem) => void;
   togglePacked: (id: string) => void;
   copyItem: (fromList: ListType, toList: ListType, id: string) => void;
@@ -123,6 +124,39 @@ export const usePackingStore = create<PackingState>()(
         set((state) => {
           state.lists = { default: { name: 'Default', toBuy: [], toPack: [], suggestions: [] } };
           state.activeList = 'default';
+        });
+      },
+
+      mergeList: (sourceId) => {
+        set((state) => {
+          if (state.activeList && sourceId !== state.activeList && state.lists[sourceId]) {
+            // Merge toBuy items
+            state.lists[sourceId].toBuy.forEach((item) => {
+              // Check if item with same name already exists in active list
+              const existingItem = state.lists[state.activeList!].toBuy.find(i => i.name.toLowerCase() === item.name.toLowerCase());
+              if (!existingItem) {
+                state.lists[state.activeList!].toBuy.push({...item});
+              }
+            });
+
+            // Merge toPack items
+            state.lists[sourceId].toPack.forEach((item) => {
+              // Check if item with same name already exists in active list
+              const existingItem = state.lists[state.activeList!].toPack.find(i => i.name.toLowerCase() === item.name.toLowerCase());
+              if (!existingItem) {
+                state.lists[state.activeList!].toPack.push({...item});
+              }
+            });
+
+            // Merge suggestions
+            state.lists[sourceId].suggestions.forEach((item) => {
+              // Check if item with same name already exists in active list
+              const existingItem = state.lists[state.activeList!].suggestions.find(i => i.name.toLowerCase() === item.name.toLowerCase());
+              if (!existingItem) {
+                state.lists[state.activeList!].suggestions.push({...item});
+              }
+            });
+          }
         });
       },
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 
-import { Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 
 import { COLORS } from '../theme/colors';
 
@@ -23,14 +23,14 @@ const PackingListItem = ({ item, onDelete, onMoveToPack, onMoveToBuy, onPress }:
         <Pressable
           style={[styles.actionButton, { backgroundColor: COLORS.secondary }]}
           onPress={onMoveToPack}>
-          <Ionicons name="briefcase-outline" size={24} color={COLORS.white} />
+          <Feather name="briefcase" size={24} color={COLORS.white} />
         </Pressable>
       )}
       {onMoveToBuy && (
         <Pressable
           style={[styles.actionButton, { backgroundColor: COLORS.primary }]}
           onPress={onMoveToBuy}>
-          <Ionicons name="cart-outline" size={24} color={COLORS.white} />
+          <Feather name="shopping-cart" size={24} color={COLORS.white} />
         </Pressable>
       )}
       {onDelete && (
@@ -47,7 +47,7 @@ const PackingListItem = ({ item, onDelete, onMoveToPack, onMoveToBuy, onPress }:
               { cancelable: true },
             );
           }}>
-          <Ionicons name="trash-bin" size={24} color={COLORS.white} />
+          <Feather name="trash-2" size={24} color={COLORS.white} />
         </Pressable>
       )}
     </View>
