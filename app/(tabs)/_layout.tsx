@@ -50,7 +50,7 @@ export default function TabLayout() {
         name="suggestions"
         options={{
           tabBarLabel: 'Suggestions',
-          tabBarIcon: ({ color, size }) => <Feather name="server" size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Feather name="zap" size={size} color={color} />,
         }}
       />
     </Tabs>

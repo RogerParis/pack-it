@@ -44,6 +44,9 @@ Please provide a simple, plain list of packing items. One item per line. Do not 
     },
   );
 
+  console.log('response data: ', response.data);
+  console.log('response status: ', response.status);
+
   const aiText = response.data.choices?.[0]?.message?.content || '';
   console.log('AI response:', aiText);
 

@@ -35,11 +35,33 @@ export default function ToPackScreen() {
   const handleAdd = useCallback(
     (name: string) => {
       const lowerName = name.trim().toLowerCase();
-      const exists = [...toPack, ...toBuy].some(
-        (item) => item.name.trim().toLowerCase() === lowerName,
-      );
-      if (exists) {
-        Alert.alert('Duplicate Item', 'This item is already in your packing lists.');
+      const inToPack = toPack.some((item) => item.name.trim().toLowerCase() === lowerName);
+      const inToBuy = toBuy.some((item) => item.name.trim().toLowerCase() === lowerName);
+
+      if (inToPack) {
+        Alert.alert('Duplicate Item', 'This item is already in your "To Pack" list.');
+        return;
+      }
+      if (inToBuy) {
+        Alert.alert(
+          'Move Item?',
+          'This item is already in your "To Buy" list. Move it to "To Pack"?',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Move',
+              onPress: () => {
+                const itemToMove = toBuy.find(
+                  (item) => item.name.trim().toLowerCase() === lowerName,
+                );
+                if (itemToMove) {
+                  removeItem('toBuy', itemToMove.id);
+                  addItem('toPack', { ...itemToMove, packed: false });
+                }
+              },
+            },
+          ],
+        );
         return;
       }
       const newItem: PackingItem = {
@@ -49,7 +71,7 @@ export default function ToPackScreen() {
       };
       addItem('toPack', newItem);
     },
-    [addItem, toPack, toBuy],
+    [addItem, removeItem, toPack, toBuy],
   );
 
   const renderItem = useCallback(
