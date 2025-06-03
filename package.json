@@ -9,8 +9,8 @@
     "web": "expo start --web",
     "test": "jest",
     "test:coverage": "jest --coverage --passWithNoTests",
-    "lint": "expo lint",
-    "lint:fix": "eslint . --fix"
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx --ignore-pattern 'node_modules/*' --ignore-pattern 'android/*' --ignore-pattern 'ios/*' --ignore-pattern '.expo/*' app/ components/ services/ store/ theme/ types/ utils/",
+    "lint:fix": "eslint --ext .js,.jsx,.ts,.tsx --ignore-pattern 'node_modules/*' --ignore-pattern 'android/*' --ignore-pattern 'ios/*' --ignore-pattern '.expo/*' app/ components/ services/ store/ theme/ types/ utils/ --fix"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",

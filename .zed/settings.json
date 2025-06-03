@@ -1,0 +1,27 @@
+{
+  "lsp": {
+    "eslint": {
+      "enable": true
+    },
+    "typescript": {
+      "enable": true
+    }
+  },
+  "editor": {
+    "auto_format_on_save": true,
+    "format_on_save": true,
+    "formatter": "prettier",
+    "semantic_index": {
+      "enabled": true
+    },
+    "soft_wrap": true,
+    "tab_size": 2
+  },
+  "prettier": {
+    "print_width": 100,
+    "semi": true,
+    "single_quote": true,
+    "tab_width": 2,
+    "trailing_comma": "es5"
+  }
+}

@@ -133,27 +133,33 @@ export const usePackingStore = create<PackingState>()(
             // Merge toBuy items
             state.lists[sourceId].toBuy.forEach((item) => {
               // Check if item with same name already exists in active list
-              const existingItem = state.lists[state.activeList!].toBuy.find(i => i.name.toLowerCase() === item.name.toLowerCase());
+              const existingItem = state.lists[state.activeList!].toBuy.find(
+                (i) => i.name.toLowerCase() === item.name.toLowerCase(),
+              );
               if (!existingItem) {
-                state.lists[state.activeList!].toBuy.push({...item});
+                state.lists[state.activeList!].toBuy.push({ ...item });
               }
             });
 
             // Merge toPack items
             state.lists[sourceId].toPack.forEach((item) => {
               // Check if item with same name already exists in active list
-              const existingItem = state.lists[state.activeList!].toPack.find(i => i.name.toLowerCase() === item.name.toLowerCase());
+              const existingItem = state.lists[state.activeList!].toPack.find(
+                (i) => i.name.toLowerCase() === item.name.toLowerCase(),
+              );
               if (!existingItem) {
-                state.lists[state.activeList!].toPack.push({...item});
+                state.lists[state.activeList!].toPack.push({ ...item });
               }
             });
 
             // Merge suggestions
             state.lists[sourceId].suggestions.forEach((item) => {
               // Check if item with same name already exists in active list
-              const existingItem = state.lists[state.activeList!].suggestions.find(i => i.name.toLowerCase() === item.name.toLowerCase());
+              const existingItem = state.lists[state.activeList!].suggestions.find(
+                (i) => i.name.toLowerCase() === item.name.toLowerCase(),
+              );
               if (!existingItem) {
-                state.lists[state.activeList!].suggestions.push({...item});
+                state.lists[state.activeList!].suggestions.push({ ...item });
               }
             });
           }

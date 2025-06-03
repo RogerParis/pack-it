@@ -12,14 +12,14 @@ import {
 } from 'react-native';
 
 import { useRouter } from 'expo-router';
-
 import { Feather } from '@expo/vector-icons';
+
+import { getSyncLabel } from '@/utils/date.utils';
 
 import { saveUserPackingData } from '@/services/cloud.service';
 import { useAuthStore } from '@/store/authStore';
 import { usePackingStore } from '@/store/packingStore';
 import { COLORS } from '@/theme/colors';
-import { getSyncLabel } from '@/utils/date.utils';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -115,7 +115,7 @@ export default function ProfileScreen() {
             Alert.alert('Success', 'List merged successfully!');
           },
         },
-      ]
+      ],
     );
   };
 
@@ -219,13 +219,13 @@ export default function ProfileScreen() {
                           <Feather name="edit-2" size={18} style={styles.actionIcon} />
                         </TouchableOpacity>
                         {item !== activeList && (
-                          <TouchableOpacity 
+                          <TouchableOpacity
                             style={styles.actionButton}
                             onPress={() => handleMergeList(item)}>
                             <Feather name="git-merge" size={18} style={styles.actionIcon} />
                           </TouchableOpacity>
                         )}
-                        <TouchableOpacity 
+                        <TouchableOpacity
                           style={styles.actionButton}
                           onPress={() => handleDeleteList(item)}>
                           <Feather name="trash-2" size={18} style={styles.actionIcon} />

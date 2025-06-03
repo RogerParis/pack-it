@@ -1,7 +1,6 @@
 import { Pressable } from 'react-native';
 
 import { Tabs, useRouter } from 'expo-router';
-
 import { Feather } from '@expo/vector-icons';
 
 import { useAuthStore } from '@/store/authStore';
@@ -25,11 +24,7 @@ export default function TabLayout() {
         ),
         headerRight: () => (
           <Pressable onPress={() => router.push('/(profile)')} style={{ marginRight: 16 }}>
-            <Feather
-              name={user ? 'user' : 'log-in'}
-              size={28}
-              color={COLORS.primary}
-            />
+            <Feather name={user ? 'user' : 'log-in'} size={28} color={COLORS.primary} />
           </Pressable>
         ),
         headerShown: true,
@@ -39,9 +34,7 @@ export default function TabLayout() {
         name="to-pack"
         options={{
           tabBarLabel: 'To Pack',
-          tabBarIcon: ({ color, size }) => (
-            <Feather name="briefcase" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Feather name="briefcase" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -57,9 +50,7 @@ export default function TabLayout() {
         name="suggestions"
         options={{
           tabBarLabel: 'Suggestions',
-          tabBarIcon: ({ color, size }) => (
-            <Feather name="zap" size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => <Feather name="server" size={size} color={color} />,
         }}
       />
     </Tabs>
