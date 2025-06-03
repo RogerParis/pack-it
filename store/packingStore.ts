@@ -130,38 +130,30 @@ export const usePackingStore = create<PackingState>()(
       mergeList: (sourceId) => {
         set((state) => {
           if (state.activeList && sourceId !== state.activeList && state.lists[sourceId]) {
+            // Build a set of all item names in toBuy and toPack of the active list
+            const activeNames = new Set(
+              [...state.lists[state.activeList].toBuy, ...state.lists[state.activeList].toPack].map(
+                (item) => item.name.trim().toLowerCase(),
+              ),
+            );
+
             // Merge toBuy items
             state.lists[sourceId].toBuy.forEach((item) => {
-              // Check if item with same name already exists in active list
-              const existingItem = state.lists[state.activeList!].toBuy.find(
-                (i) => i.name.toLowerCase() === item.name.toLowerCase(),
-              );
-              if (!existingItem) {
+              if (!activeNames.has(item.name.trim().toLowerCase())) {
                 state.lists[state.activeList!].toBuy.push({ ...item });
+                activeNames.add(item.name.trim().toLowerCase());
               }
             });
 
             // Merge toPack items
             state.lists[sourceId].toPack.forEach((item) => {
-              // Check if item with same name already exists in active list
-              const existingItem = state.lists[state.activeList!].toPack.find(
-                (i) => i.name.toLowerCase() === item.name.toLowerCase(),
-              );
-              if (!existingItem) {
+              if (!activeNames.has(item.name.trim().toLowerCase())) {
                 state.lists[state.activeList!].toPack.push({ ...item });
+                activeNames.add(item.name.trim().toLowerCase());
               }
             });
 
-            // Merge suggestions
-            state.lists[sourceId].suggestions.forEach((item) => {
-              // Check if item with same name already exists in active list
-              const existingItem = state.lists[state.activeList!].suggestions.find(
-                (i) => i.name.toLowerCase() === item.name.toLowerCase(),
-              );
-              if (!existingItem) {
-                state.lists[state.activeList!].suggestions.push({ ...item });
-              }
-            });
+            // Do NOT merge suggestions from the source list
           }
         });
       },
