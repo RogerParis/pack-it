@@ -10,6 +10,10 @@
   "editor": {
     "auto_format_on_save": true,
     "format_on_save": true,
+    "code_actions_on_format": {
+      "source.fixAll": true,
+      "source.organizeImports": true
+    },
     "formatter": "prettier",
     "semantic_index": {
       "enabled": true
