@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 
 import AddPackingItemInput from '@/components/add_packing_item_input.component';
 import PackingListItem from '@/components/packing_list_item.component';
@@ -12,24 +12,36 @@ import { v4 as uuid } from 'uuid';
 export default function ToPackScreen() {
   const { togglePacked, removeItem, copyItem, addItem } = usePackingStore();
 
-  const rawToPack = usePackingStore((state) => {
+  const toPack = usePackingStore((state) => {
     const activeList = state.activeList;
     return activeList ? state.lists[activeList].toPack : [];
   });
+  const toBuy = usePackingStore((state) => {
+    const activeList = state.activeList;
+    return activeList ? state.lists[activeList].toBuy : [];
+  });
 
-  const totalItems = rawToPack.length;
-  const packedItems = rawToPack.filter((item) => item.packed).length;
+  const totalItems = toPack.length;
+  const packedItems = toPack.filter((item) => item.packed).length;
   const progress = totalItems === 0 ? 0 : packedItems / totalItems;
 
   const sortedToPack = useMemo(() => {
-    return [...rawToPack].sort((a, b) => {
+    return [...toPack].sort((a, b) => {
       if (a.packed === b.packed) return 0;
       return a.packed ? 1 : -1; // unpacked first
     });
-  }, [rawToPack]);
+  }, [toPack]);
 
   const handleAdd = useCallback(
     (name: string) => {
+      const lowerName = name.trim().toLowerCase();
+      const exists = [...toPack, ...toBuy].some(
+        (item) => item.name.trim().toLowerCase() === lowerName,
+      );
+      if (exists) {
+        Alert.alert('Duplicate Item', 'This item is already in your packing lists.');
+        return;
+      }
       const newItem: PackingItem = {
         id: uuid(),
         name,
@@ -37,7 +49,7 @@ export default function ToPackScreen() {
       };
       addItem('toPack', newItem);
     },
-    [addItem],
+    [addItem, toPack, toBuy],
   );
 
   const renderItem = useCallback(

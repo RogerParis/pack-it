@@ -1,12 +1,11 @@
 import React, { useCallback } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { Alert, FlatList, StyleSheet, View } from 'react-native';
 
 import AddPackingItemInput from '@/components/add_packing_item_input.component';
 import PackingListItem from '@/components/packing_list_item.component';
 
-import { usePackingStore } from '../../store/packingStore';
-import { PackingItem } from '../../types/packing';
-
+import { usePackingStore } from '@/store/packingStore';
+import { PackingItem } from '@/types/packing';
 import { v4 as uuid } from 'uuid';
 
 export default function ToBuyScreen() {
@@ -16,9 +15,21 @@ export default function ToBuyScreen() {
     const activeList = state.activeList;
     return activeList ? state.lists[activeList].toBuy : [];
   });
+  const toPack = usePackingStore((state) => {
+    const activeList = state.activeList;
+    return activeList ? state.lists[activeList].toPack : [];
+  });
 
   const handleAdd = useCallback(
     (name: string) => {
+      const lowerName = name.trim().toLowerCase();
+      const exists = [...toBuy, ...toPack].some(
+        (item) => item.name.trim().toLowerCase() === lowerName,
+      );
+      if (exists) {
+        Alert.alert('Duplicate Item', 'This item is already in your packing lists.');
+        return;
+      }
       const newItem: PackingItem = {
         id: uuid(),
         name,
@@ -26,7 +37,7 @@ export default function ToBuyScreen() {
       };
       addItem('toBuy', newItem);
     },
-    [addItem],
+    [addItem, toBuy, toPack],
   );
 
   const renderItem = ({ item }: { item: PackingItem }) => (
