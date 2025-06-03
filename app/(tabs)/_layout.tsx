@@ -1,6 +1,7 @@
 import { Pressable } from 'react-native';
 
 import { Tabs, useRouter } from 'expo-router';
+
 import { Feather } from '@expo/vector-icons';
 
 import { useAuthStore } from '@/store/authStore';

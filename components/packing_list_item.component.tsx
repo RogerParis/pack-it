@@ -1,12 +1,13 @@
 import React from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 
 import { Feather } from '@expo/vector-icons';
 
-import { COLORS } from '../theme/colors';
-
 import { PackingItem } from '@/types/packing';
+
+import { COLORS } from '../theme/colors';
 
 type Props = {
   item: PackingItem;

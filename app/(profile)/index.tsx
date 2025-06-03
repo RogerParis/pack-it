@@ -10,16 +10,16 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Feather } from '@expo/vector-icons';
 
 import { useRouter } from 'expo-router';
 
-import { getSyncLabel } from '@/utils/date.utils';
+import { Feather } from '@expo/vector-icons';
 
 import { saveUserPackingData } from '@/services/cloud.service';
 import { useAuthStore } from '@/store/authStore';
 import { usePackingStore } from '@/store/packingStore';
 import { COLORS } from '@/theme/colors';
+import { getSyncLabel } from '@/utils/date.utils';
 
 export default function ProfileScreen() {
   const router = useRouter();
