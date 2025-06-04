@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   StyleSheet,
   Text,
   TextInput,
@@ -55,9 +54,9 @@ export default function SuggestionsListHeader({ onGenerate }: Props) {
         style={styles.input}
       />
 
-      <Pressable style={styles.dateButton} onPress={() => setShowStartPicker(true)}>
+      <TouchableOpacity style={styles.dateButton} onPress={() => setShowStartPicker(true)}>
         <Text>Start Date: {formatDate(startDate)}</Text>
-      </Pressable>
+      </TouchableOpacity>
 
       {showStartPicker && (
         <DateTimePicker
@@ -71,9 +70,9 @@ export default function SuggestionsListHeader({ onGenerate }: Props) {
         />
       )}
 
-      <Pressable style={styles.dateButton} onPress={() => setShowEndPicker(true)}>
+      <TouchableOpacity style={styles.dateButton} onPress={() => setShowEndPicker(true)}>
         <Text>End Date: {formatDate(endDate)}</Text>
-      </Pressable>
+      </TouchableOpacity>
 
       {showEndPicker && (
         <DateTimePicker

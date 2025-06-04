@@ -1,4 +1,4 @@
-import { Pressable } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 
 import { Tabs, useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
@@ -18,14 +18,20 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerLeft: () => (
-          <Pressable onPress={() => router.push('/(donate)')} style={{ marginLeft: 16 }}>
+          <TouchableOpacity
+            onPress={() => router.push('/(donate)')}
+            style={{ marginLeft: 16 }}
+            activeOpacity={0.5}>
             <Feather name="coffee" size={24} color={COLORS.primary} />
-          </Pressable>
+          </TouchableOpacity>
         ),
         headerRight: () => (
-          <Pressable onPress={() => router.push('/(profile)')} style={{ marginRight: 16 }}>
+          <TouchableOpacity
+            onPress={() => router.push('/(profile)')}
+            style={{ marginRight: 16 }}
+            activeOpacity={0.5}>
             <Feather name={user ? 'user' : 'log-in'} size={28} color={COLORS.primary} />
-          </Pressable>
+          </TouchableOpacity>
         ),
         headerShown: true,
         headerTitle: activeListName,

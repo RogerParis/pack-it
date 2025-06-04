@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 
 import { Feather } from '@expo/vector-icons';
@@ -21,36 +21,39 @@ const PackingListItem = ({ item, onDelete, onMoveToPack, onMoveToBuy, onPress }:
   const renderRightActions = () => (
     <View style={styles.actionsContainer}>
       {onMoveToPack && (
-        <Pressable
+        <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: COLORS.secondary }]}
-          onPress={onMoveToPack}>
+          onPress={onMoveToPack}
+          activeOpacity={0.5}>
           <Feather name="briefcase" size={24} color={COLORS.white} />
-        </Pressable>
+        </TouchableOpacity>
       )}
       {onMoveToBuy && (
-        <Pressable
+        <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: COLORS.primary }]}
-          onPress={onMoveToBuy}>
+          onPress={onMoveToBuy}
+          activeOpacity={0.5}>
           <Feather name="shopping-cart" size={24} color={COLORS.white} />
-        </Pressable>
+        </TouchableOpacity>
       )}
       {onDelete && (
-        <Pressable
+        <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: COLORS.error }]}
-          onPress={() => showDeleteItemAlert(onDelete)}>
+          onPress={() => showDeleteItemAlert(onDelete)}
+          activeOpacity={0.5}>
           <Feather name="trash-2" size={24} color={COLORS.white} />
-        </Pressable>
+        </TouchableOpacity>
       )}
     </View>
   );
 
   return (
     <Swipeable renderRightActions={renderRightActions}>
-      <Pressable onPress={onPress}>
+      <TouchableOpacity onPress={onPress} activeOpacity={0.5}>
         <View style={styles.item}>
           <Text style={[styles.itemText, item.packed && styles.packedText]}>{item.name}</Text>
         </View>
-      </Pressable>
+      </TouchableOpacity>
     </Swipeable>
   );
 };

@@ -3,10 +3,10 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -88,29 +88,30 @@ export default function LoginScreen() {
           </Animated.Text>
         )}
 
-        <Pressable
+        <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
           onPress={handleLogin}
-          disabled={loading}>
+          disabled={loading}
+          activeOpacity={0.5}>
           {loading ? (
             <ActivityIndicator color={COLORS.white} />
           ) : (
             <Text style={styles.buttonText}>Login</Text>
           )}
-        </Pressable>
+        </TouchableOpacity>
       </View>
 
-      <Pressable onPress={() => router.push('/signup')}>
+      <TouchableOpacity onPress={() => router.push('/signup')} activeOpacity={0.5}>
         <Text style={styles.link}>Don't have an account? Sign up</Text>
-      </Pressable>
+      </TouchableOpacity>
 
-      <Pressable onPress={() => router.push('/forgot-password')}>
+      <TouchableOpacity onPress={() => router.push('/forgot-password')} activeOpacity={0.5}>
         <Text style={styles.link}>Forgot password?</Text>
-      </Pressable>
+      </TouchableOpacity>
 
-      <Pressable onPress={() => router.replace('/to-pack')}>
+      <TouchableOpacity onPress={() => router.replace('/to-pack')} activeOpacity={0.5}>
         <Text style={styles.link}>Continue as Guest</Text>
-      </Pressable>
+      </TouchableOpacity>
     </KeyboardAvoidingView>
   );
 }
