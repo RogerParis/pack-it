@@ -6,8 +6,8 @@ import { Feather } from '@expo/vector-icons';
 
 import { COLORS } from '../theme/colors';
 
-import { PackingItem } from '@/types/packing';
 import { showAlert } from '@/services/alerts/alerts.service';
+import { PackingItem } from '@/types/packing';
 
 type Props = {
   item: PackingItem;

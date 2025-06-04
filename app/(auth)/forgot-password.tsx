@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -14,6 +13,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
 
+import { showAlert } from '@/services/alerts/alerts.service';
 import { resetPassword } from '@/services/auth.service';
 import { COLORS } from '@/theme/colors';
 
@@ -34,7 +34,6 @@ export default function ForgotPasswordScreen() {
     try {
       await resetPassword(email);
       // Use alert service for success
-      import { showAlert } from '@/services/alerts/alerts.service';
       showAlert({ title: 'Success', message: 'Password reset email sent.' });
       router.push('/(auth)/login');
     } catch (err) {

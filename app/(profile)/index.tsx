@@ -16,11 +16,11 @@ import { Feather } from '@expo/vector-icons';
 
 import { getSyncLabel } from '@/utils/date.utils';
 
+import { showAlert } from '@/services/alerts/alerts.service';
 import { saveUserPackingData } from '@/services/cloud.service';
 import { useAuthStore } from '@/store/authStore';
 import { usePackingStore } from '@/store/packingStore';
 import { COLORS } from '@/theme/colors';
-import { showAlert } from '@/services/alerts/alerts.service';
 
 export default function ProfileScreen() {
   const router = useRouter();
