@@ -6,12 +6,13 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
-import { onUserAuthStateChanged } from '../services/auth.service';
-import { useAuthStore } from '../store/authStore';
-import { usePackingStore } from '../store/packingStore';
+import GlobalOverlayAlert from '@/components/global_overlay_alert';
 
 import 'react-native-get-random-values';
+import { onUserAuthStateChanged } from '@/services/auth.service';
 import { getUserPackingData, saveUserPackingData } from '@/services/cloud.service';
+import { useAuthStore } from '@/store/authStore';
+import { usePackingStore } from '@/store/packingStore';
 
 export default function RootLayout() {
   const setUser = useAuthStore((state) => state.setUser);
@@ -103,6 +104,7 @@ export default function RootLayout() {
             }}
           />
         </Stack>
+        <GlobalOverlayAlert />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

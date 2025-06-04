@@ -6,7 +6,7 @@ import { Feather } from '@expo/vector-icons';
 
 import { COLORS } from '../theme/colors';
 
-import { showAlert } from '@/services/alerts/alerts.service';
+import { showDeleteItemAlert } from '@/services/alerts.service';
 import { PackingItem } from '@/types/packing';
 
 type Props = {
@@ -37,17 +37,7 @@ const PackingListItem = ({ item, onDelete, onMoveToPack, onMoveToBuy, onPress }:
       {onDelete && (
         <Pressable
           style={[styles.actionButton, { backgroundColor: COLORS.error }]}
-          onPress={() => {
-            showAlert({
-              title: 'Delete Item',
-              message: 'Are you sure you want to delete this item?',
-              buttons: [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Delete', style: 'destructive', onPress: onDelete },
-              ],
-              cancelable: true,
-            });
-          }}>
+          onPress={() => showDeleteItemAlert(onDelete)}>
           <Feather name="trash-2" size={24} color={COLORS.white} />
         </Pressable>
       )}
@@ -73,22 +63,22 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
     borderRadius: 8,
   },
-  itemText: { fontSize: 16 },
+  itemText: {
+    fontSize: 18,
+    color: COLORS.text,
+  },
   packedText: {
     textDecorationLine: 'line-through',
     color: COLORS.neutral500,
   },
   actionsContainer: {
     flexDirection: 'row',
-    alignItems: 'stretch',
+    alignItems: 'center',
     height: '100%',
   },
   actionButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 80,
+    padding: 12,
+    marginHorizontal: 4,
     borderRadius: 8,
-    marginLeft: 8,
-    height: '100%',
   },
 });

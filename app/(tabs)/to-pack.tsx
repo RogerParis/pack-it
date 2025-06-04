@@ -4,7 +4,7 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import AddPackingItemInput from '@/components/add_packing_item_input.component';
 import PackingListItem from '@/components/packing_list_item.component';
 
-import { showDuplicateItemAlert, showMoveItemAlert } from '@/services/alerts/alerts.service';
+import { showDuplicateItemAlert, showMoveItemAlert } from '@/services/alerts.service';
 import { usePackingStore } from '@/store/packingStore';
 import { COLORS } from '@/theme/colors';
 import { PackingItem } from '@/types/packing';

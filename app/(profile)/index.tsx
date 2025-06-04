@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from 'react';
 import {
-  // Alert,
   FlatList,
   Modal,
   SafeAreaView,
@@ -16,7 +15,12 @@ import { Feather } from '@expo/vector-icons';
 
 import { getSyncLabel } from '@/utils/date.utils';
 
-import { showAlert } from '@/services/alerts/alerts.service';
+import {
+  showCannotDeleteListAlert,
+  showDeleteListAlert,
+  showMergeListAlert,
+  showMergeSuccessAlert,
+} from '@/services/alerts.service';
 import { saveUserPackingData } from '@/services/cloud.service';
 import { useAuthStore } from '@/store/authStore';
 import { usePackingStore } from '@/store/packingStore';
@@ -78,29 +82,16 @@ export default function ProfileScreen() {
 
   const handleDeleteList = (id: string) => {
     if (Object.keys(lists).length === 1) {
-      showAlert({ title: 'Cannot delete the only list.', message: '' });
+      showCannotDeleteListAlert('only');
       return;
     }
 
     if (id === activeList) {
-      showAlert({ title: 'Switch to another list before deleting this one.', message: '' });
+      showCannotDeleteListAlert('active');
       return;
     }
 
-    showAlert({
-      title: 'Delete List',
-      message: 'Are you sure you want to delete this list?',
-      buttons: [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            deleteList(id);
-          },
-        },
-      ],
-    });
+    showDeleteListAlert(() => deleteList(id));
   };
 
   const handleMergeList = (id: string) => {
@@ -108,19 +99,9 @@ export default function ProfileScreen() {
       return; // Should never happen as we hide the merge button for active list
     }
 
-    showAlert({
-      title: 'Merge List',
-      message: `Are you sure you want to merge "${lists[id].name}" into your active list "${lists[activeList!].name}"?`,
-      buttons: [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Merge',
-          onPress: () => {
-            mergeList(id);
-            showAlert({ title: 'Success', message: 'List merged successfully!' });
-          },
-        },
-      ],
+    showMergeListAlert(lists[id].name, lists[activeList!].name, () => {
+      mergeList(id);
+      showMergeSuccessAlert();
     });
   };
 

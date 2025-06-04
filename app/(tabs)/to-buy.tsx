@@ -4,11 +4,10 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import AddPackingItemInput from '@/components/add_packing_item_input.component';
 import PackingListItem from '@/components/packing_list_item.component';
 
-import { showDuplicateItemAlert, showMoveItemAlert } from '@/services/alerts/alerts.service';
+import { showDuplicateItemAlert, showMoveItemAlert } from '@/services/alerts.service';
 import { usePackingStore } from '@/store/packingStore';
 import { PackingItem } from '@/types/packing';
 import { v4 as uuid } from 'uuid';
-
 export default function ToBuyScreen() {
   const { addItem, removeItem, copyItem } = usePackingStore();
 
