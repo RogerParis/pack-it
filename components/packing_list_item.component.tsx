@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 
 import { Feather } from '@expo/vector-icons';
@@ -7,6 +7,7 @@ import { Feather } from '@expo/vector-icons';
 import { COLORS } from '../theme/colors';
 
 import { PackingItem } from '@/types/packing';
+import { showAlert } from '@/services/alerts/alerts.service';
 
 type Props = {
   item: PackingItem;
@@ -37,15 +38,15 @@ const PackingListItem = ({ item, onDelete, onMoveToPack, onMoveToBuy, onPress }:
         <Pressable
           style={[styles.actionButton, { backgroundColor: COLORS.error }]}
           onPress={() => {
-            Alert.alert(
-              'Delete Item',
-              'Are you sure you want to delete this item?',
-              [
+            showAlert({
+              title: 'Delete Item',
+              message: 'Are you sure you want to delete this item?',
+              buttons: [
                 { text: 'Cancel', style: 'cancel' },
                 { text: 'Delete', style: 'destructive', onPress: onDelete },
               ],
-              { cancelable: true },
-            );
+              cancelable: true,
+            });
           }}>
           <Feather name="trash-2" size={24} color={COLORS.white} />
         </Pressable>

@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
-import { Alert, FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 
 import AddPackingItemInput from '@/components/add_packing_item_input.component';
 import PackingListItem from '@/components/packing_list_item.component';
 
+import { showDuplicateItemAlert, showMoveItemAlert } from '@/services/alerts/alerts.service';
 import { usePackingStore } from '@/store/packingStore';
 import { PackingItem } from '@/types/packing';
 import { v4 as uuid } from 'uuid';
@@ -27,30 +28,17 @@ export default function ToBuyScreen() {
       const inToPack = toPack.some((item) => item.name.trim().toLowerCase() === lowerName);
 
       if (inToBuy) {
-        Alert.alert('Duplicate Item', 'This item is already in your "To Buy" list.');
+        showDuplicateItemAlert('To Buy');
         return;
       }
       if (inToPack) {
-        Alert.alert(
-          'Item Exists in To Pack',
-          'This item is already in your "To Pack" list. Move it to "To Buy"?',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            {
-              text: 'Move',
-              onPress: () => {
-                // Find the item in toPack
-                const itemToMove = toPack.find(
-                  (item) => item.name.trim().toLowerCase() === lowerName,
-                );
-                if (itemToMove) {
-                  removeItem('toPack', itemToMove.id);
-                  addItem('toBuy', { ...itemToMove, packed: false });
-                }
-              },
-            },
-          ],
-        );
+        showMoveItemAlert('To Pack', 'To Buy', () => {
+          const itemToMove = toPack.find((item) => item.name.trim().toLowerCase() === lowerName);
+          if (itemToMove) {
+            removeItem('toPack', itemToMove.id);
+            addItem('toBuy', { ...itemToMove, packed: false });
+          }
+        });
         return;
       }
       const newItem: PackingItem = {

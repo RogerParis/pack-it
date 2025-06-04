@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import {
-  Alert,
+  // Alert,
   FlatList,
   Modal,
   SafeAreaView,
@@ -20,6 +20,7 @@ import { saveUserPackingData } from '@/services/cloud.service';
 import { useAuthStore } from '@/store/authStore';
 import { usePackingStore } from '@/store/packingStore';
 import { COLORS } from '@/theme/colors';
+import { showAlert } from '@/services/alerts/alerts.service';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -77,25 +78,29 @@ export default function ProfileScreen() {
 
   const handleDeleteList = (id: string) => {
     if (Object.keys(lists).length === 1) {
-      Alert.alert('Cannot delete the only list.');
+      showAlert({ title: 'Cannot delete the only list.', message: '' });
       return;
     }
 
     if (id === activeList) {
-      Alert.alert('Switch to another list before deleting this one.');
+      showAlert({ title: 'Switch to another list before deleting this one.', message: '' });
       return;
     }
 
-    Alert.alert('Delete List', 'Are you sure you want to delete this list?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () => {
-          deleteList(id);
+    showAlert({
+      title: 'Delete List',
+      message: 'Are you sure you want to delete this list?',
+      buttons: [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            deleteList(id);
+          },
         },
-      },
-    ]);
+      ],
+    });
   };
 
   const handleMergeList = (id: string) => {
@@ -103,20 +108,20 @@ export default function ProfileScreen() {
       return; // Should never happen as we hide the merge button for active list
     }
 
-    Alert.alert(
-      'Merge List',
-      `Are you sure you want to merge "${lists[id].name}" into your active list "${lists[activeList!].name}"?`,
-      [
+    showAlert({
+      title: 'Merge List',
+      message: `Are you sure you want to merge "${lists[id].name}" into your active list "${lists[activeList!].name}"?`,
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Merge',
           onPress: () => {
             mergeList(id);
-            Alert.alert('Success', 'List merged successfully!');
+            showAlert({ title: 'Success', message: 'List merged successfully!' });
           },
         },
       ],
-    );
+    });
   };
 
   const listKeys = Object.keys(lists);

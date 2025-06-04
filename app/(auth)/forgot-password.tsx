@@ -33,7 +33,9 @@ export default function ForgotPasswordScreen() {
     setError('');
     try {
       await resetPassword(email);
-      Alert.alert('Success', 'Password reset email sent.');
+      // Use alert service for success
+      import { showAlert } from '@/services/alerts/alerts.service';
+      showAlert({ title: 'Success', message: 'Password reset email sent.' });
       router.push('/(auth)/login');
     } catch (err) {
       console.error('Reset failed:', err);
