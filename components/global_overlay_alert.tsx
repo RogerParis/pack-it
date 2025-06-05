@@ -9,7 +9,7 @@ const GlobalOverlayAlert: React.FC = () => {
   if (!visible) return null;
 
   return (
-    <View style={styles.overlay} pointerEvents="box-none">
+    <View style={styles.overlay}>
       <View style={styles.container}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.message}>{message}</Text>
@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 24,
+    marginHorizontal: 16,
     minWidth: 280,
     alignItems: 'center',
     elevation: 6,
@@ -80,11 +81,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
     color: '#444',
+    maxWidth: '80%',
+    lineHeight: 22,
   },
   buttonRow: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     width: '100%',
+    paddingHorizontal: 16,
   },
   button: {
     marginLeft: 12,
