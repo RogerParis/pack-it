@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { PanGestureHandler } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -73,19 +73,11 @@ export default function ProfileScreen() {
   }));
 
   // Gesture handler for swipe down to dismiss
-  interface GestureHandlerEvent {
-    nativeEvent: {
-      translationY: number;
-      state: number;
-    };
-  }
-
-  const gestureHandler = React.useCallback((event: GestureHandlerEvent) => {
-    const { translationY } = event.nativeEvent;
-    if (translationY > 60) {
+  const panGesture = Gesture.Pan().onUpdate((event) => {
+    if (event.translationY > 60) {
       runOnJS(setPickerVisible)(false);
     }
-  }, []);
+  });
 
   // --- End Animated Bottom Sheet Logic ---
 
@@ -210,7 +202,7 @@ export default function ProfileScreen() {
       {/* Animated Bottom Sheet */}
       {sheetVisible && (
         <View style={styles.overlay}>
-          <PanGestureHandler onGestureEvent={gestureHandler}>
+          <GestureDetector gesture={panGesture}>
             <Animated.View style={[styles.modal, animatedSheetStyle]}>
               <View style={styles.modalTopBorder} />
               <Text style={styles.modalTitle}>Select Packing List</Text>
@@ -274,7 +266,7 @@ export default function ProfileScreen() {
                 <Text style={styles.buttonText}>Close</Text>
               </TouchableOpacity>
             </Animated.View>
-          </PanGestureHandler>
+          </GestureDetector>
         </View>
       )}
     </SafeAreaView>
