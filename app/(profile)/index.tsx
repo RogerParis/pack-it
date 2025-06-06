@@ -73,8 +73,15 @@ export default function ProfileScreen() {
   }));
 
   // Gesture handler for swipe down to dismiss
-  const gestureHandler = React.useCallback((event) => {
-    const { translationY, state } = event.nativeEvent;
+  interface GestureHandlerEvent {
+    nativeEvent: {
+      translationY: number;
+      state: number;
+    };
+  }
+
+  const gestureHandler = React.useCallback((event: GestureHandlerEvent) => {
+    const { translationY } = event.nativeEvent;
     if (translationY > 60) {
       runOnJS(setPickerVisible)(false);
     }
