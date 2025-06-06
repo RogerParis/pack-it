@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import {
+  Dimensions,
   FlatList,
-  Modal,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -9,6 +9,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { PanGestureHandler } from 'react-native-gesture-handler';
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
@@ -43,6 +51,36 @@ export default function ProfileScreen() {
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [renaming, setRenaming] = useState<string | null>(null);
   const [renameText, setRenameText] = useState('');
+
+  // --- Animated Bottom Sheet Logic ---
+  const sheetAnim = useSharedValue(Dimensions.get('window').height);
+  const [sheetVisible, setSheetVisible] = useState(false);
+
+  React.useEffect(() => {
+    if (isPickerVisible) {
+      setSheetVisible(true);
+      sheetAnim.value = Dimensions.get('window').height;
+      sheetAnim.value = withSpring(0, { damping: 20 });
+    } else {
+      sheetAnim.value = withTiming(Dimensions.get('window').height, {}, (finished) => {
+        if (finished) runOnJS(setSheetVisible)(false);
+      });
+    }
+  }, [isPickerVisible]);
+
+  const animatedSheetStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: sheetAnim.value }],
+  }));
+
+  // Gesture handler for swipe down to dismiss
+  const gestureHandler = React.useCallback((event) => {
+    const { translationY, state } = event.nativeEvent;
+    if (translationY > 60) {
+      runOnJS(setPickerVisible)(false);
+    }
+  }, []);
+
+  // --- End Animated Bottom Sheet Logic ---
 
   const handleLogin = useCallback(() => {
     router.push('/login');
@@ -162,72 +200,76 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      <Modal visible={isPickerVisible} transparent animationType="slide">
+      {/* Animated Bottom Sheet */}
+      {sheetVisible && (
         <View style={styles.overlay}>
-          <View style={styles.modal}>
-            <Text style={styles.modalTitle}>Select Packing List</Text>
-            <FlatList
-              data={listKeys}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <View style={[styles.modalItem, item === activeList && styles.modalItemActive]}>
-                  {renaming === item ? (
-                    <View style={styles.renameRow}>
-                      <TextInput
-                        value={renameText}
-                        onChangeText={setRenameText}
-                        style={styles.input}
-                        onSubmitEditing={() => handleRenameSubmit(item)}
-                        returnKeyType="done"
-                      />
-                      <TouchableOpacity
-                        onPress={() => handleRenameSubmit(item)}
-                        style={styles.button}>
-                        <Text style={styles.buttonText}>Save</Text>
-                      </TouchableOpacity>
-                    </View>
-                  ) : (
-                    <View style={styles.modalItemWrapper}>
-                      <TouchableOpacity
-                        onPress={() => handleSelectList(item)}
-                        style={[styles.selectRow]}>
-                        <Text style={styles.modalItemText}>
-                          {lists[item].name} {item === activeList ? '✅' : ''}
-                        </Text>
-                      </TouchableOpacity>
-                      <View style={styles.actionsRow}>
+          <PanGestureHandler onGestureEvent={gestureHandler}>
+            <Animated.View style={[styles.modal, animatedSheetStyle]}>
+              <View style={styles.modalTopBorder} />
+              <Text style={styles.modalTitle}>Select Packing List</Text>
+              <FlatList
+                data={listKeys}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <View style={[styles.modalItem, item === activeList && styles.modalItemActive]}>
+                    {renaming === item ? (
+                      <View style={styles.renameRow}>
+                        <TextInput
+                          value={renameText}
+                          onChangeText={setRenameText}
+                          style={styles.input}
+                          onSubmitEditing={() => handleRenameSubmit(item)}
+                          returnKeyType="done"
+                        />
                         <TouchableOpacity
-                          style={styles.actionButton}
-                          onPress={() => {
-                            setRenaming(item);
-                            setRenameText(lists[item].name);
-                          }}>
-                          <Feather name="edit-2" size={18} style={styles.actionIcon} />
-                        </TouchableOpacity>
-                        {item !== activeList && (
-                          <TouchableOpacity
-                            style={styles.actionButton}
-                            onPress={() => handleMergeList(item)}>
-                            <Feather name="git-merge" size={18} style={styles.actionIcon} />
-                          </TouchableOpacity>
-                        )}
-                        <TouchableOpacity
-                          style={styles.actionButton}
-                          onPress={() => handleDeleteList(item)}>
-                          <Feather name="trash-2" size={18} style={styles.actionIcon} />
+                          onPress={() => handleRenameSubmit(item)}
+                          style={styles.button}>
+                          <Text style={styles.buttonText}>Save</Text>
                         </TouchableOpacity>
                       </View>
-                    </View>
-                  )}
-                </View>
-              )}
-            />
-            <TouchableOpacity onPress={() => setPickerVisible(false)} style={styles.button}>
-              <Text style={styles.buttonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
+                    ) : (
+                      <View style={styles.modalItemWrapper}>
+                        <TouchableOpacity
+                          onPress={() => handleSelectList(item)}
+                          style={[styles.selectRow]}>
+                          <Text style={styles.modalItemText}>
+                            {lists[item].name} {item === activeList ? '✅' : ''}
+                          </Text>
+                        </TouchableOpacity>
+                        <View style={styles.actionsRow}>
+                          <TouchableOpacity
+                            style={styles.actionButton}
+                            onPress={() => {
+                              setRenaming(item);
+                              setRenameText(lists[item].name);
+                            }}>
+                            <Feather name="edit-2" size={18} style={styles.actionIcon} />
+                          </TouchableOpacity>
+                          {item !== activeList && (
+                            <TouchableOpacity
+                              style={styles.actionButton}
+                              onPress={() => handleMergeList(item)}>
+                              <Feather name="git-merge" size={18} style={styles.actionIcon} />
+                            </TouchableOpacity>
+                          )}
+                          <TouchableOpacity
+                            style={styles.actionButton}
+                            onPress={() => handleDeleteList(item)}>
+                            <Feather name="trash-2" size={18} style={styles.actionIcon} />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    )}
+                  </View>
+                )}
+              />
+              <TouchableOpacity onPress={() => setPickerVisible(false)} style={styles.button}>
+                <Text style={styles.buttonText}>Close</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </PanGestureHandler>
         </View>
-      </Modal>
+      )}
     </SafeAreaView>
   );
 }
@@ -275,15 +317,28 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    elevation: 5,
   },
   modal: {
-    backgroundColor: 'white',
     padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '80%',
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
     gap: 12,
+    backgroundColor: COLORS.white,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 8, // Android shadow
+  },
+  modalTopBorder: {
+    height: 3,
+    width: 36,
+    backgroundColor: COLORS.neutral300,
+    alignSelf: 'center',
+    borderRadius: 1.5,
+    marginBottom: 12,
   },
   modalTitle: {
     fontSize: 18,
