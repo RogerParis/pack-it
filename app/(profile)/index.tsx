@@ -5,10 +5,12 @@ import { useRouter } from 'expo-router';
 
 import PackingListsBottomSheet from '@/components/packing_lists_bottom_sheet.component';
 import { getSyncLabel } from '@/utils/date.utils';
+import { isDuplicatePackingListName } from '@/utils/packing_list.utils';
 
 import {
   showCannotDeleteListAlert,
   showDeleteListAlert,
+  showDuplicateNameAlert,
   showMergeListAlert,
   showMergeSuccessAlert,
 } from '@/services/alerts.service';
@@ -47,12 +49,17 @@ export default function ProfileScreen() {
     const trimmed = newListName.trim();
     if (!trimmed) return;
 
+    if (isDuplicatePackingListName(lists, trimmed)) {
+      showDuplicateNameAlert();
+      return;
+    }
+
     const newId = createList(trimmed);
     setNewListName('');
     setActiveList(newId);
     handleSync();
     router.push('/(tabs)/to-pack');
-  }, [newListName, createList, setActiveList, handleSync, router]);
+  }, [newListName, createList, setActiveList, handleSync, router, lists]);
 
   const handleSelectList = useCallback(
     (listId: string) => {

@@ -95,3 +95,10 @@ export const showPasswordResetSuccessAlert = () => {
     message: 'Password reset email sent.',
   });
 };
+
+export const showDuplicateNameAlert = () => {
+  showAlert({
+    title: 'Duplicate List Name',
+    message: `A packing list with this name already exists. Please choose a different name.`,
+  });
+};

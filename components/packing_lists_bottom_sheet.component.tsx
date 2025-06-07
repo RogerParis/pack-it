@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Dimensions,
   FlatList,
@@ -19,6 +19,9 @@ import Animated, {
 
 import { Feather } from '@expo/vector-icons';
 
+import { isDuplicatePackingListName } from '@/utils/packing_list.utils';
+
+import { showDuplicateNameAlert } from '@/services/alerts.service';
 import { COLORS } from '@/theme/colors';
 
 type BottomSheetProps = {
@@ -56,7 +59,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
 
   const screenHeight = Dimensions.get('window').height;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (sheetVisible) {
       sheetAnim.value = screenHeight;
       sheetAnim.value = withSpring(0, { damping: 20 });
@@ -83,6 +86,14 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
       }
     });
 
+  const handleRename = (item: string) => {
+    if (isDuplicatePackingListName(lists, renameText)) {
+      showDuplicateNameAlert();
+      return;
+    }
+    handleRenameSubmit(item);
+  };
+
   return (
     <View style={styles.overlay}>
       <Animated.View style={[styles.modal, animatedSheetStyle]}>
@@ -103,10 +114,10 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                     value={renameText}
                     onChangeText={setRenameText}
                     style={styles.input}
-                    onSubmitEditing={() => handleRenameSubmit(item)}
+                    onSubmitEditing={() => handleRename(item)}
                     returnKeyType="done"
                   />
-                  <TouchableOpacity onPress={() => handleRenameSubmit(item)} style={styles.button}>
+                  <TouchableOpacity onPress={() => handleRename(item)} style={styles.button}>
                     <Text style={styles.buttonText}>Save</Text>
                   </TouchableOpacity>
                 </View>
