@@ -73,11 +73,17 @@ export default function ProfileScreen() {
   }));
 
   // Gesture handler for swipe down to dismiss
-  const panGesture = Gesture.Pan().onUpdate((event) => {
-    if (event.translationY > 60) {
-      runOnJS(setPickerVisible)(false);
-    }
-  });
+  const panGesture = Gesture.Pan()
+    .onUpdate((event) => {
+      sheetAnim.value = Math.max(event.translationY, 0); // Update animation dynamically
+    })
+    .onEnd((event) => {
+      if (event.translationY > 60) {
+        runOnJS(setPickerVisible)(false);
+      } else {
+        sheetAnim.value = withSpring(0, { damping: 20 }); // Reset position
+      }
+    });
 
   // --- End Animated Bottom Sheet Logic ---
 
@@ -202,71 +208,71 @@ export default function ProfileScreen() {
       {/* Animated Bottom Sheet */}
       {sheetVisible && (
         <View style={styles.overlay}>
-          <GestureDetector gesture={panGesture}>
-            <Animated.View style={[styles.modal, animatedSheetStyle]}>
+          <Animated.View style={[styles.modal, animatedSheetStyle]}>
+            <GestureDetector gesture={panGesture}>
               <View style={styles.modalTopBorder} />
-              <Text style={styles.modalTitle}>Select Packing List</Text>
-              <FlatList
-                data={listKeys}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <View style={[styles.modalItem, item === activeList && styles.modalItemActive]}>
-                    {renaming === item ? (
-                      <View style={styles.renameRow}>
-                        <TextInput
-                          value={renameText}
-                          onChangeText={setRenameText}
-                          style={styles.input}
-                          onSubmitEditing={() => handleRenameSubmit(item)}
-                          returnKeyType="done"
-                        />
+            </GestureDetector>
+            <Text style={styles.modalTitle}>Select Packing List</Text>
+            <FlatList
+              data={listKeys}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <View style={[styles.modalItem, item === activeList && styles.modalItemActive]}>
+                  {renaming === item ? (
+                    <View style={styles.renameRow}>
+                      <TextInput
+                        value={renameText}
+                        onChangeText={setRenameText}
+                        style={styles.input}
+                        onSubmitEditing={() => handleRenameSubmit(item)}
+                        returnKeyType="done"
+                      />
+                      <TouchableOpacity
+                        onPress={() => handleRenameSubmit(item)}
+                        style={styles.button}>
+                        <Text style={styles.buttonText}>Save</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View style={styles.modalItemWrapper}>
+                      <TouchableOpacity
+                        onPress={() => handleSelectList(item)}
+                        style={[styles.selectRow]}>
+                        <Text style={styles.modalItemText}>
+                          {lists[item].name} {item === activeList ? '✅' : ''}
+                        </Text>
+                      </TouchableOpacity>
+                      <View style={styles.actionsRow}>
                         <TouchableOpacity
-                          onPress={() => handleRenameSubmit(item)}
-                          style={styles.button}>
-                          <Text style={styles.buttonText}>Save</Text>
+                          style={styles.actionButton}
+                          onPress={() => {
+                            setRenaming(item);
+                            setRenameText(lists[item].name);
+                          }}>
+                          <Feather name="edit-2" size={18} style={styles.actionIcon} />
                         </TouchableOpacity>
-                      </View>
-                    ) : (
-                      <View style={styles.modalItemWrapper}>
-                        <TouchableOpacity
-                          onPress={() => handleSelectList(item)}
-                          style={[styles.selectRow]}>
-                          <Text style={styles.modalItemText}>
-                            {lists[item].name} {item === activeList ? '✅' : ''}
-                          </Text>
-                        </TouchableOpacity>
-                        <View style={styles.actionsRow}>
+                        {item !== activeList && (
                           <TouchableOpacity
                             style={styles.actionButton}
-                            onPress={() => {
-                              setRenaming(item);
-                              setRenameText(lists[item].name);
-                            }}>
-                            <Feather name="edit-2" size={18} style={styles.actionIcon} />
+                            onPress={() => handleMergeList(item)}>
+                            <Feather name="git-merge" size={18} style={styles.actionIcon} />
                           </TouchableOpacity>
-                          {item !== activeList && (
-                            <TouchableOpacity
-                              style={styles.actionButton}
-                              onPress={() => handleMergeList(item)}>
-                              <Feather name="git-merge" size={18} style={styles.actionIcon} />
-                            </TouchableOpacity>
-                          )}
-                          <TouchableOpacity
-                            style={styles.actionButton}
-                            onPress={() => handleDeleteList(item)}>
-                            <Feather name="trash-2" size={18} style={styles.actionIcon} />
-                          </TouchableOpacity>
-                        </View>
+                        )}
+                        <TouchableOpacity
+                          style={styles.actionButton}
+                          onPress={() => handleDeleteList(item)}>
+                          <Feather name="trash-2" size={18} style={styles.actionIcon} />
+                        </TouchableOpacity>
                       </View>
-                    )}
-                  </View>
-                )}
-              />
-              <TouchableOpacity onPress={() => setPickerVisible(false)} style={styles.button}>
-                <Text style={styles.buttonText}>Close</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          </GestureDetector>
+                    </View>
+                  )}
+                </View>
+              )}
+            />
+            <TouchableOpacity onPress={() => setPickerVisible(false)} style={styles.button}>
+              <Text style={styles.buttonText}>Close</Text>
+            </TouchableOpacity>
+          </Animated.View>
         </View>
       )}
     </SafeAreaView>
@@ -332,8 +338,8 @@ const styles = StyleSheet.create({
     elevation: 8, // Android shadow
   },
   modalTopBorder: {
-    height: 3,
-    width: 36,
+    height: 5, // Reverted to previous height
+    width: 60, // Reverted to previous width
     backgroundColor: COLORS.neutral300,
     alignSelf: 'center',
     borderRadius: 1.5,
