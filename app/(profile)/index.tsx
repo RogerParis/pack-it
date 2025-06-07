@@ -52,7 +52,6 @@ export default function ProfileScreen() {
   const [renaming, setRenaming] = useState<string | null>(null);
   const [renameText, setRenameText] = useState('');
 
-  // --- Animated Bottom Sheet Logic ---
   const sheetAnim = useSharedValue(Dimensions.get('window').height);
   const [sheetVisible, setSheetVisible] = useState(false);
 
@@ -72,20 +71,17 @@ export default function ProfileScreen() {
     transform: [{ translateY: sheetAnim.value }],
   }));
 
-  // Gesture handler for swipe down to dismiss
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
-      sheetAnim.value = Math.max(event.translationY, 0); // Update animation dynamically
+      sheetAnim.value = Math.max(event.translationY, 0);
     })
     .onEnd((event) => {
       if (event.translationY > 60) {
         runOnJS(setPickerVisible)(false);
       } else {
-        sheetAnim.value = withSpring(0, { damping: 20 }); // Reset position
+        sheetAnim.value = withSpring(0, { damping: 20 });
       }
     });
-
-  // --- End Animated Bottom Sheet Logic ---
 
   const handleLogin = useCallback(() => {
     router.push('/login');
@@ -139,7 +135,7 @@ export default function ProfileScreen() {
 
   const handleMergeList = (id: string) => {
     if (id === activeList) {
-      return; // Should never happen as we hide the merge button for active list
+      return;
     }
 
     showMergeListAlert(lists[id].name, lists[activeList!].name, () => {
@@ -205,11 +201,9 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      {/* Animated Bottom Sheet */}
       {sheetVisible && (
         <View style={styles.overlay}>
           <Animated.View style={[styles.modal, animatedSheetStyle]}>
-            {/* Updated swipe-to-dismiss area */}
             <GestureDetector gesture={panGesture}>
               <View style={styles.swipeWrapper}>
                 <View style={styles.modalTopBorder} />
@@ -339,16 +333,16 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
-    elevation: 8, // Android shadow
+    elevation: 8,
   },
   swipeWrapper: {
-    paddingVertical: 20, // Increase swipeable area vertically
-    paddingHorizontal: 40, // Increase swipeable area horizontally
+    paddingVertical: 20,
+    paddingHorizontal: 40,
     alignItems: 'center',
   },
   modalTopBorder: {
-    height: 5, // Reverted to previous height
-    width: 60, // Reverted to previous width
+    height: 5,
+    width: 60,
     backgroundColor: COLORS.neutral300,
     alignSelf: 'center',
     borderRadius: 1.5,
