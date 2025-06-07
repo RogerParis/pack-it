@@ -209,8 +209,11 @@ export default function ProfileScreen() {
       {sheetVisible && (
         <View style={styles.overlay}>
           <Animated.View style={[styles.modal, animatedSheetStyle]}>
+            {/* Updated swipe-to-dismiss area */}
             <GestureDetector gesture={panGesture}>
-              <View style={styles.modalTopBorder} />
+              <View style={styles.swipeWrapper}>
+                <View style={styles.modalTopBorder} />
+              </View>
             </GestureDetector>
             <Text style={styles.modalTitle}>Select Packing List</Text>
             <FlatList
@@ -325,7 +328,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   modal: {
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
     gap: 12,
@@ -337,13 +341,17 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8, // Android shadow
   },
+  swipeWrapper: {
+    paddingVertical: 20, // Increase swipeable area vertically
+    paddingHorizontal: 40, // Increase swipeable area horizontally
+    alignItems: 'center',
+  },
   modalTopBorder: {
     height: 5, // Reverted to previous height
     width: 60, // Reverted to previous width
     backgroundColor: COLORS.neutral300,
     alignSelf: 'center',
     borderRadius: 1.5,
-    marginBottom: 12,
   },
   modalTitle: {
     fontSize: 18,
