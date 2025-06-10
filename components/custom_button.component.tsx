@@ -1,24 +1,36 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
+import {
+  ActivityIndicator,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  ViewStyle,
+} from 'react-native';
 
 import { COLORS } from '@/theme/colors';
 
 type CustomButtonProps = {
-  title: string;
+  title?: string;
   onPress: () => void;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
   loading?: boolean;
   disabled?: boolean;
   variant?: 'primary' | 'secondary' | 'error';
+  icon?: React.ReactNode; // Allow an icon prop to render custom icons
 };
 
 const CustomButton: React.FC<CustomButtonProps> = ({
   title,
   onPress,
   style,
+  textStyle,
   loading = false,
   disabled = false,
   variant = 'primary',
+  icon,
 }) => {
   const buttonStyles = [
     styles.button,
@@ -37,7 +49,10 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       {loading ? (
         <ActivityIndicator color={COLORS.white} />
       ) : (
-        <Text style={styles.buttonText}>{title}</Text>
+        <>
+          {icon && <>{icon}</>}
+          {title && <Text style={[styles.buttonText, textStyle]}>{title}</Text>}
+        </>
       )}
     </TouchableOpacity>
   );

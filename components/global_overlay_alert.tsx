@@ -1,7 +1,10 @@
 import React from 'react';
-import { Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Platform, StyleSheet, Text, View } from 'react-native';
+
+import CustomButton from '@/components/custom_button.component';
 
 import { useAlertStore } from '@/store/alertStore';
+import { COLORS } from '@/theme/colors';
 
 const GlobalOverlayAlert: React.FC = () => {
   const { visible, title, message, buttons, hideAlert } = useAlertStore();
@@ -18,20 +21,19 @@ const GlobalOverlayAlert: React.FC = () => {
             ? buttons
             : [{ text: 'OK', style: 'default', onPress: () => {} }]
           ).map((btn, idx) => (
-            <TouchableOpacity
+            <CustomButton
               key={idx}
+              title={btn.text}
+              onPress={() => {
+                btn.onPress?.();
+                hideAlert();
+              }}
               style={[
                 styles.button,
                 btn.style === 'cancel' && styles.cancelButton,
                 btn.style === 'destructive' && styles.destructiveButton,
               ]}
-              onPress={() => {
-                btn.onPress?.();
-                hideAlert();
-              }}
-              activeOpacity={0.8}>
-              <Text style={styles.buttonText}>{btn.text}</Text>
-            </TouchableOpacity>
+            />
           ))}
         </View>
       </View>
@@ -91,24 +93,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   button: {
-    marginLeft: 12,
-    paddingVertical: Platform.OS === 'ios' ? 10 : 8,
-    paddingHorizontal: 18,
-    borderRadius: 8,
-    backgroundColor: '#007AFF',
+    backgroundColor: COLORS.primary,
     minWidth: 80,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
   cancelButton: {
-    backgroundColor: '#aaa',
+    backgroundColor: COLORS.neutral500,
   },
   destructiveButton: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: COLORS.error,
   },
 });
 
