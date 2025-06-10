@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput } from 'react-native';
 
-import Button from '@/components/custom_button.component';
+import CustomButton from '@/components/custom_button.component';
 
 import { COLORS } from '@/theme/colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -48,7 +48,7 @@ export default function SuggestionsListHeader({ onGenerate }: Props) {
         style={styles.input}
       />
 
-      <Button
+      <CustomButton
         title={`Start Date: ${formatDate(startDate)}`}
         onPress={() => setShowStartPicker(true)}
         style={styles.dateButton}
@@ -66,7 +66,7 @@ export default function SuggestionsListHeader({ onGenerate }: Props) {
         />
       )}
 
-      <Button
+      <CustomButton
         title={`End Date: ${formatDate(endDate)}`}
         onPress={() => setShowEndPicker(true)}
         style={styles.dateButton}
@@ -91,7 +91,7 @@ export default function SuggestionsListHeader({ onGenerate }: Props) {
         style={styles.input}
       />
 
-      <Button
+      <CustomButton
         title={loading ? 'Loading...' : 'Generate Suggestions'}
         onPress={handleGenerate}
         disabled={loading}

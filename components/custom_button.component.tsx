@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, ViewStyle } from
 
 import { COLORS } from '@/theme/colors';
 
-type ButtonProps = {
+type CustomButtonProps = {
   title: string;
   onPress: () => void;
   style?: ViewStyle;
@@ -12,7 +12,7 @@ type ButtonProps = {
   variant?: 'primary' | 'secondary' | 'error';
 };
 
-const Button: React.FC<ButtonProps> = ({
+const CustomButton: React.FC<CustomButtonProps> = ({
   title,
   onPress,
   style,
@@ -66,4 +66,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Button;
+export default CustomButton;

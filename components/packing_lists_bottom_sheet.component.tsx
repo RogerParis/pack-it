@@ -19,7 +19,7 @@ import Animated, {
 
 import { Feather } from '@expo/vector-icons';
 
-import Button from '@/components/custom_button.component';
+import CustomButton from '@/components/custom_button.component';
 import { isDuplicatePackingListName } from '@/utils/packing_list.utils';
 
 import { showDuplicateNameAlert } from '@/services/alerts.service';
@@ -118,7 +118,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                     onSubmitEditing={() => handleRename(item)}
                     returnKeyType="done"
                   />
-                  <Button title="Save" onPress={() => handleRename(item)} />
+                  <CustomButton title="Save" onPress={() => handleRename(item)} />
                 </View>
               ) : (
                 <View style={styles.modalItemWrapper}>
@@ -156,7 +156,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
             </View>
           )}
         />
-        <Button title="Close" onPress={() => setSheetVisible(false)} />
+        <CustomButton title="Close" onPress={() => setSheetVisible(false)} />
       </Animated.View>
     </View>
   );
