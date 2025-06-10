@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dimensions, Platform, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 
 import CustomButton from '@/components/custom_button.component';
 
