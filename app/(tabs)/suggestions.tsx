@@ -119,5 +119,5 @@ export default function SuggestionsScreen() {
 }
 
 const styles = StyleSheet.create({
-  list: { gap: 12 },
+  list: { gap: 12, margin: 16 },
 });
