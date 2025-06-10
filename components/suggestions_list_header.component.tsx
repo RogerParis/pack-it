@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput } from 'react-native';
+
+import Button from '@/components/custom_button.component';
 
 import { COLORS } from '@/theme/colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -54,9 +48,11 @@ export default function SuggestionsListHeader({ onGenerate }: Props) {
         style={styles.input}
       />
 
-      <TouchableOpacity style={styles.dateButton} onPress={() => setShowStartPicker(true)}>
-        <Text>Start Date: {formatDate(startDate)}</Text>
-      </TouchableOpacity>
+      <Button
+        title="Start Date"
+        onPress={() => setShowStartPicker(true)}
+        style={styles.dateButton}
+      />
 
       {showStartPicker && (
         <DateTimePicker
@@ -70,9 +66,7 @@ export default function SuggestionsListHeader({ onGenerate }: Props) {
         />
       )}
 
-      <TouchableOpacity style={styles.dateButton} onPress={() => setShowEndPicker(true)}>
-        <Text>End Date: {formatDate(endDate)}</Text>
-      </TouchableOpacity>
+      <Button title="End Date" onPress={() => setShowEndPicker(true)} style={styles.dateButton} />
 
       {showEndPicker && (
         <DateTimePicker
@@ -93,16 +87,11 @@ export default function SuggestionsListHeader({ onGenerate }: Props) {
         style={styles.input}
       />
 
-      <TouchableOpacity
+      <Button
+        title={loading ? 'Loading...' : 'Generate Suggestions'}
         onPress={handleGenerate}
         disabled={loading}
-        style={[styles.button, loading && styles.buttonDisabled]}>
-        {loading ? (
-          <ActivityIndicator color={COLORS.white} />
-        ) : (
-          <Text style={styles.buttonText}>Generate Suggestions</Text>
-        )}
-      </TouchableOpacity>
+      />
 
       <Text style={styles.subheading}>Generated Suggestions:</Text>
     </KeyboardAvoidingView>
@@ -126,20 +115,5 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
     borderRadius: 6,
-  },
-  button: {
-    backgroundColor: COLORS.primary,
-    padding: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 12,
-  },
-  buttonDisabled: {
-    backgroundColor: COLORS.neutral300,
-  },
-  buttonText: {
-    color: COLORS.white,
-    fontWeight: '600',
-    fontSize: 16,
   },
 });

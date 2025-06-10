@@ -19,6 +19,7 @@ import Animated, {
 
 import { Feather } from '@expo/vector-icons';
 
+import Button from '@/components/custom_button.component';
 import { isDuplicatePackingListName } from '@/utils/packing_list.utils';
 
 import { showDuplicateNameAlert } from '@/services/alerts.service';
@@ -117,9 +118,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
                     onSubmitEditing={() => handleRename(item)}
                     returnKeyType="done"
                   />
-                  <TouchableOpacity onPress={() => handleRename(item)} style={styles.button}>
-                    <Text style={styles.buttonText}>Save</Text>
-                  </TouchableOpacity>
+                  <Button title="Save" onPress={() => handleRename(item)} />
                 </View>
               ) : (
                 <View style={styles.modalItemWrapper}>
@@ -157,9 +156,7 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
             </View>
           )}
         />
-        <TouchableOpacity onPress={() => setSheetVisible(false)} style={styles.button}>
-          <Text style={styles.buttonText}>Close</Text>
-        </TouchableOpacity>
+        <Button title="Close" onPress={() => setSheetVisible(false)} />
       </Animated.View>
     </View>
   );
@@ -244,16 +241,6 @@ const styles = StyleSheet.create({
   actionIcon: {
     padding: 4,
     color: COLORS.text,
-  },
-  button: {
-    backgroundColor: COLORS.primary,
-    padding: 12,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: COLORS.white,
-    fontWeight: '600',
   },
   input: {
     flex: 1,
