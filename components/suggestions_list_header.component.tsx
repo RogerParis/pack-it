@@ -49,7 +49,7 @@ export default function SuggestionsListHeader({ onGenerate }: Props) {
       />
 
       <Button
-        title="Start Date"
+        title={`Start Date: ${formatDate(startDate)}`}
         onPress={() => setShowStartPicker(true)}
         style={styles.dateButton}
       />
@@ -66,7 +66,11 @@ export default function SuggestionsListHeader({ onGenerate }: Props) {
         />
       )}
 
-      <Button title="End Date" onPress={() => setShowEndPicker(true)} style={styles.dateButton} />
+      <Button
+        title={`End Date: ${formatDate(endDate)}`}
+        onPress={() => setShowEndPicker(true)}
+        style={styles.dateButton}
+      />
 
       {showEndPicker && (
         <DateTimePicker
