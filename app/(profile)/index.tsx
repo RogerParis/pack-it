@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
@@ -106,7 +106,7 @@ export default function ProfileScreen() {
   const listKeys = Object.keys(lists);
 
   return (
-    <SafeAreaView style={styles.screen}>
+    <>
       <View style={styles.container}>
         <View style={styles.card}>
           <Text style={styles.label}>Status</Text>
@@ -177,13 +177,12 @@ export default function ProfileScreen() {
           handleDeleteList={handleDeleteList}
         />
       )}
-    </SafeAreaView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#fff' },
-  container: { flex: 1, padding: 20, gap: 24 },
+  container: { flex: 1, padding: 20, gap: 24, backgroundColor: COLORS.white },
   card: {
     backgroundColor: '#F2F2F2',
     padding: 16,
