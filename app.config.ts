@@ -34,6 +34,9 @@ export default {
       OPEN_WEATHER_API_KEY: process.env.OPEN_WEATHER_API_KEY,
       OPENAI_API_KEY: process.env.OPENAI_API_KEY,
       GROQ_API_KEY: process.env.GROQ_API_KEY,
+      eas: {
+        projectId: '88c4da5a-7194-4206-8b4c-abe0f4b7115d',
+      },
     },
   },
 };
