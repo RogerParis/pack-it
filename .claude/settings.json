@@ -1,0 +1,59 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:registry.npmjs.org)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:tanstack.com)",
+      "WebFetch(domain:zustand.docs.pmnd.rs)",
+      "WebFetch(domain:docs.pmnd.rs)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:pmndrs.github.io)",
+      "WebFetch(domain:zustand-demo.pmnd.rs)",
+      "mcp__expo-mcp__open_devtools",
+      "mcp__expo-mcp__automation_take_screenshot",
+      "mcp__expo-mcp__automation_tap",
+      "mcp__langgraph-docs__list_doc_sources",
+      "Bash(npx tsc*)",
+      "Bash(./node_modules/.bin/tsc*)",
+      "Bash(jq*)",
+      "Bash(npm view*)"
+    ]
+  },
+  "enabledMcpjsonServers": ["expo-mcp", "langgraph-docs", "firebase"],
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "touch /tmp/claude-did-edit"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "terminal-notifier -message 'Claude finished the task' -title 'Claude Code'"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "git diff --quiet HEAD || (yarn lint --fix && yarn tsc --noEmit)",
+            "timeout": 240,
+            "statusMessage": "Running lint & type check..."
+          }
+        ]
+      }
+    ]
+  }
+}
