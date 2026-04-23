@@ -12,6 +12,8 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
 
+import { getFirebaseAuthError } from '@/utils/auth.utils';
+
 import { authStyles as styles } from '@/app/(auth)/auth.styles';
 import { useAuthStore } from '@/store/authStore';
 
@@ -38,8 +40,7 @@ export default function LoginScreen() {
       await signIn(email, password);
       router.push('/(tabs)/to-pack');
     } catch (err) {
-      console.error('Login failed:', err);
-      setError('Invalid email or password.');
+      setError(getFirebaseAuthError(err));
     } finally {
       setLoading(false);
     }

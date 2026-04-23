@@ -12,6 +12,8 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
 
+import { getFirebaseAuthError } from '@/utils/auth.utils';
+
 import { authStyles as styles } from '@/app/(auth)/auth.styles';
 import { showPasswordResetSuccessAlert } from '@/services/alerts.service';
 import { resetPassword } from '@/services/auth.service';
@@ -35,8 +37,7 @@ export default function ForgotPasswordScreen() {
       showPasswordResetSuccessAlert();
       router.push('/(auth)/login');
     } catch (err) {
-      console.error('Reset failed:', err);
-      setError('Could not send reset email. Try again.');
+      setError(getFirebaseAuthError(err));
     } finally {
       setLoading(false);
     }

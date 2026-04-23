@@ -12,6 +12,8 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { useRouter } from 'expo-router';
 
+import { getFirebaseAuthError } from '@/utils/auth.utils';
+
 import { authStyles as styles } from '@/app/(auth)/auth.styles';
 import { useAuthStore } from '@/store/authStore';
 
@@ -38,8 +40,7 @@ export default function SignupScreen() {
       await register(email, password);
       router.push('/(auth)/login');
     } catch (err) {
-      console.error('Signup failed:', err);
-      setError('Account could not be created. Try a different email.');
+      setError(getFirebaseAuthError(err));
     } finally {
       setLoading(false);
     }

@@ -145,9 +145,9 @@ Fixed `packingStore.ts` `mergeList` — replaced `state.activeList!` with a loca
 
 ### 17. Generic Firebase error messages
 **Files:** `app/(auth)/`
-**Status:** Open
+**Status:** Resolved
 
-`auth/user-not-found`, `auth/wrong-password`, etc. mapped to generic strings. Map Firebase error codes to specific user-facing messages.
+Created `utils/auth.utils.ts` with `getFirebaseAuthError()` — maps Firebase error codes to specific messages. Used in all three auth screens.
 
 ---
 
@@ -156,7 +156,7 @@ Fixed `packingStore.ts` `mergeList` — replaced `state.activeList!` with a loca
 | Severity | Total | Open | Resolved |
 |----------|-------|------|----------|
 | Critical | 3     | 1    | 2        |
-| High     | 4     | 2    | 2        |
-| Medium   | 5     | 5    | 0        |
-| Low      | 5     | 5    | 0        |
-| **Total**| **17**| **13**| **4**   |
+| High     | 4     | 0    | 4        |
+| Medium   | 5     | 0    | 5        |
+| Low      | 5     | 1    | 4        |
+| **Total**| **17**| **2**| **15**  |
