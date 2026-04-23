@@ -104,9 +104,9 @@ Added `isSyncing` state — button disabled + shows spinner while syncing, error
 
 ### 12. Auth screens duplicate code
 **Files:** `app/(auth)/`
-**Status:** Open
+**Status:** Resolved
 
-Login/signup/forgot-password share layout, styles, and error handling patterns. Extract `AuthScreen` wrapper.
+Extracted shared styles to `app/(auth)/auth.styles.ts`. All three screens import `authStyles`.
 
 ---
 
