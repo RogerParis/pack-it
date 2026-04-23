@@ -96,9 +96,9 @@ Exported `ErrorBoundary` function from `app/_layout.tsx` using Expo Router's bui
 
 ### 11. Sync button has no loading/disabled state
 **File:** `app/(profile)/index.tsx:147`
-**Status:** Open
+**Status:** Resolved
 
-User gets no feedback. Double-tap triggers duplicate syncs.
+Added `isSyncing` state — button disabled + shows spinner while syncing, error caught and logged.
 
 ---
 

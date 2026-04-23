@@ -1,5 +1,12 @@
 import React, { useCallback, useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import { useRouter } from 'expo-router';
 
@@ -33,6 +40,7 @@ export default function ProfileScreen() {
   const lists = usePackingStore((state) => state.lists);
 
   const [newListName, setNewListName] = useState('');
+  const [isSyncing, setIsSyncing] = useState(false);
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [renaming, setRenaming] = useState<string | null>(null);
   const [renameText, setRenameText] = useState('');
@@ -41,9 +49,17 @@ export default function ProfileScreen() {
     router.push('/login');
   }, [router]);
 
-  const handleSync = useCallback(() => {
-    if (user) saveUserPackingData(user);
-  }, [user]);
+  const handleSync = useCallback(async () => {
+    if (!user || isSyncing) return;
+    setIsSyncing(true);
+    try {
+      await saveUserPackingData(user);
+    } catch (error) {
+      console.error('Sync failed:', error);
+    } finally {
+      setIsSyncing(false);
+    }
+  }, [user, isSyncing]);
 
   const handleCreateList = useCallback(() => {
     const trimmed = newListName.trim();
@@ -142,8 +158,15 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.card}>
-          <TouchableOpacity onPress={handleSync} style={styles.button}>
-            <Text style={styles.buttonText}>Sync Now</Text>
+          <TouchableOpacity
+            onPress={handleSync}
+            style={[styles.button, isSyncing && styles.buttonDisabled]}
+            disabled={isSyncing}>
+            {isSyncing ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.buttonText}>Sync Now</Text>
+            )}
           </TouchableOpacity>
 
           {user ? (
@@ -204,6 +227,9 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 6,
     alignItems: 'center',
+  },
+  buttonDisabled: {
+    backgroundColor: COLORS.neutral300,
   },
   buttonAlt: {
     backgroundColor: COLORS.secondary,
