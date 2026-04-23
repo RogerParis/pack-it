@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { AppState } from 'react-native';
+import { AppState, Button, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { Stack } from 'expo-router';
+import { ErrorBoundaryProps, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 import GlobalOverlayAlert from '@/components/global_overlay_alert';
@@ -13,6 +13,16 @@ import { onUserAuthStateChanged } from '@/services/auth.service';
 import { getUserPackingData, saveUserPackingData } from '@/services/cloud.service';
 import { useAuthStore } from '@/store/authStore';
 import { usePackingStore } from '@/store/packingStore';
+
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  return (
+    <View style={styles.errorContainer}>
+      <Text style={styles.errorTitle}>Something went wrong</Text>
+      <Text style={styles.errorMessage}>{error.message}</Text>
+      <Button onPress={retry} title="Try again" />
+    </View>
+  );
+}
 
 export default function RootLayout() {
   const setUser = useAuthStore((state) => state.setUser);
@@ -117,3 +127,9 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  errorContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+  errorTitle: { fontSize: 18, fontWeight: '600', marginBottom: 8 },
+  errorMessage: { fontSize: 14, color: '#666', marginBottom: 16, textAlign: 'center' },
+});

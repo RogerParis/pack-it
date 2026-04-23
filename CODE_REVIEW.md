@@ -88,9 +88,9 @@ Replaced `Date.now()-${item}` with `uuid()`.
 ---
 
 ### 10. No Error Boundary
-**Status:** Open
+**Status:** Resolved
 
-Malformed Firestore data crashes the entire app. Wrap root in an ErrorBoundary class component.
+Exported `ErrorBoundary` function from `app/_layout.tsx` using Expo Router's built-in `ErrorBoundaryProps`. Includes retry button.
 
 ---
 
