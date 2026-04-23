@@ -47,9 +47,9 @@ OPENAI_API_KEY and GROQ_API_KEY sent directly from device. Anyone can intercept 
 
 ### 5. Unhandled rejections in AI calls
 **Files:** `app/(tabs)/suggestions.tsx:47-62`, `services/vertexai.service.ts:29-32`
-**Status:** Partially resolved
+**Status:** Resolved
 
-Weather and AI service calls missing try/catch. Fixed in `suggestions.tsx` — AI call wrapped in try/catch with error alert shown to user. `vertexai.service.ts` still unhandled.
+Weather and AI service calls missing try/catch. Fixed in `suggestions.tsx` — entire generation wrapped in try/catch with error alert. `vertexai.service.ts` errors bubble up and are caught by the caller.
 
 ---
 

@@ -8,7 +8,6 @@ export const getPackingSuggestionsFromAI = async (
   activities: string,
   weather: string,
 ) => {
-  console.log('Generating packing suggestions...');
   const prompt = `
 I am preparing for a trip and need to create a packing list.
 
@@ -27,10 +26,5 @@ Please provide a list of items I should pack for this trip.
   const model = getGenerativeModel(vertexai, { model: 'gemini-1.5-flash' });
 
   const result = await model.generateContent(prompt);
-  console.log('VertexAI result:', result);
-
-  const text = result.response.text();
-  console.log('VertexAI response:', text);
-
-  return text;
+  return result.response.text();
 };
