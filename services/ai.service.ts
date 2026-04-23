@@ -44,7 +44,6 @@ Please provide a list of items I should pack for this trip.
     },
   );
 
-  console.log('AI response:', response.data);
   const aiText = response.data.choices?.[0]?.message?.content || '';
   return aiText;
 };

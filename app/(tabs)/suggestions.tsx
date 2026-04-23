@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import PackingListItem from '@/components/packing_list_item.component';
@@ -9,6 +9,8 @@ import { PackingItem } from '../../types/packing';
 
 import { getPackingSuggestionsFromAI } from '@/services/groq_ai.service';
 import { getWeatherForecast } from '@/services/weather.service';
+import { useAlertStore } from '@/store/alertStore';
+import { v4 as uuid } from 'uuid';
 
 export default function SuggestionsScreen() {
   const addItem = usePackingStore((state) => state.addItem);
@@ -17,7 +19,7 @@ export default function SuggestionsScreen() {
     return activeList ? state.lists[activeList].suggestions : [];
   });
   const clearList = usePackingStore((state) => state.clearList);
-  const copyItem = usePackingStore((state) => state.copyItem);
+  const moveItem = usePackingStore((state) => state.moveItem);
   const removeItem = usePackingStore((state) => state.removeItem);
   const toBuy = usePackingStore((state) => {
     const activeList = state.activeList;
@@ -27,6 +29,7 @@ export default function SuggestionsScreen() {
     const activeList = state.activeList;
     return activeList ? state.lists[activeList].toPack : [];
   });
+  const isGenerating = useRef(false);
 
   const handleGenerate = useCallback(
     async ({
@@ -40,48 +43,57 @@ export default function SuggestionsScreen() {
       endDate: Date | null;
       activities?: string;
     }) => {
-      console.log('Generating suggestions...');
-      let weatherHint = 'No weather data available';
+      if (isGenerating.current) return;
+      isGenerating.current = true;
 
-      if (location) {
-        try {
-          const weatherData = await getWeatherForecast(location);
-          weatherHint = weatherData?.list?.[0]?.weather?.[0]?.description || 'No forecast';
-        } catch (error) {
-          console.warn('Failed to fetch weather data:', error);
+      try {
+        let weatherHint = 'No weather data available';
+
+        if (location) {
+          try {
+            const weatherData = await getWeatherForecast(location);
+            weatherHint = weatherData?.list?.[0]?.weather?.[0]?.description || 'No forecast';
+          } catch (error) {
+            console.warn('Failed to fetch weather data:', error);
+          }
         }
-      }
 
-      console.log('Weather hint:', weatherHint);
-      const aiSuggestionsText = await getPackingSuggestionsFromAI(
-        location || '',
-        startDate,
-        endDate,
-        activities || '',
-        weatherHint,
-      );
+        const aiSuggestionsText = await getPackingSuggestionsFromAI(
+          location || '',
+          startDate,
+          endDate,
+          activities || '',
+          weatherHint,
+        );
 
-      console.log('AI suggestions:\n', aiSuggestionsText);
-      const existingItems = new Set(
-        [...toBuy, ...toPack].map((item) => item.name.trim().toLowerCase()),
-      );
-      console.log('Existing items:', existingItems);
+        const existingItems = new Set(
+          [...toBuy, ...toPack].map((item) => item.name.trim().toLowerCase()),
+        );
 
-      const aiSuggestions = aiSuggestionsText
-        .split('\n')
-        .map((item: string) => item.trim())
-        .filter((item: string) => item && !existingItems.has(item.toLowerCase()));
+        const aiSuggestions = aiSuggestionsText
+          .split('\n')
+          .map((item: string) => item.trim())
+          .filter((item: string) => item && !existingItems.has(item.toLowerCase()));
 
-      clearList('suggestions');
-      console.log('Cleared previous suggestions');
+        clearList('suggestions');
 
-      aiSuggestions.forEach((item: string) => {
-        addItem('suggestions', {
-          id: `${Date.now()}-${item}`,
-          name: item,
-          packed: false,
+        aiSuggestions.forEach((item: string) => {
+          addItem('suggestions', {
+            id: uuid(),
+            name: item,
+            packed: false,
+          });
         });
-      });
+      } catch (error) {
+        console.error('Failed to generate suggestions:', error);
+        useAlertStore.getState().showAlert({
+          title: 'Generation Failed',
+          message: 'Could not generate suggestions. Please try again.',
+          buttons: [{ text: 'OK', style: 'cancel' }],
+        });
+      } finally {
+        isGenerating.current = false;
+      }
     },
     [addItem, clearList, toBuy, toPack],
   );
@@ -91,17 +103,17 @@ export default function SuggestionsScreen() {
       <PackingListItem
         item={item}
         onMoveToBuy={() => {
-          copyItem('suggestions', 'toBuy', item.id);
+          moveItem('suggestions', 'toBuy', item.id);
           removeItem('suggestions', item.id);
         }}
         onMoveToPack={() => {
-          copyItem('suggestions', 'toPack', item.id);
+          moveItem('suggestions', 'toPack', item.id);
           removeItem('suggestions', item.id);
         }}
         onDelete={() => removeItem('suggestions', item.id)}
       />
     ),
-    [copyItem, removeItem],
+    [moveItem, removeItem],
   );
 
   return (

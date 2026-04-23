@@ -1,0 +1,26 @@
+{
+  "mcpServers": {
+    "expo-mcp": {
+      "type": "http",
+      "url": "https://mcp.expo.dev/mcp"
+    },
+    "firebase": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "firebase-tools@latest", "mcp"]
+    },
+    "langgraph-docs": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "mcpdoc",
+        "mcpdoc",
+        "--urls",
+        "react-native:https://reactnative.dev/llms.txt",
+        "zustand:https://zustand.docs.pmnd.rs/llms.txt",
+        "tanstack:https://tanstack.com/llms.txt"
+      ]
+    }
+  }
+}

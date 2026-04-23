@@ -20,7 +20,7 @@ type PackingState = {
   mergeList: (sourceId: string) => void;
   addItem: (type: ListType, item: PackingItem) => void;
   togglePacked: (id: string) => void;
-  copyItem: (fromList: ListType, toList: ListType, id: string) => void;
+  moveItem: (fromList: ListType, toList: ListType, id: string) => void;
   removeItem: (type: ListType, id: string) => void;
   clearList: (type: ListType) => void;
   clearAllLists: () => void;
@@ -90,7 +90,7 @@ export const usePackingStore = create<PackingState>()(
         });
       },
 
-      copyItem: (fromList, toList, id) => {
+      moveItem: (fromList, toList, id) => {
         set((state) => {
           if (state.activeList && fromList !== toList) {
             const index = state.lists[state.activeList][fromList].findIndex((i) => i.id === id);
@@ -129,32 +129,29 @@ export const usePackingStore = create<PackingState>()(
 
       mergeList: (sourceId) => {
         set((state) => {
-          if (state.activeList && sourceId !== state.activeList && state.lists[sourceId]) {
-            // Build a set of all item names in toBuy and toPack of the active list
-            const activeNames = new Set(
-              [...state.lists[state.activeList].toBuy, ...state.lists[state.activeList].toPack].map(
-                (item) => item.name.trim().toLowerCase(),
-              ),
-            );
+          const activeId = state.activeList;
+          if (!activeId || sourceId === activeId || !state.lists[sourceId]) return;
 
-            // Merge toBuy items
-            state.lists[sourceId].toBuy.forEach((item) => {
-              if (!activeNames.has(item.name.trim().toLowerCase())) {
-                state.lists[state.activeList!].toBuy.push({ ...item });
-                activeNames.add(item.name.trim().toLowerCase());
-              }
-            });
+          const activeList = state.lists[activeId];
+          const activeNames = new Set(
+            [...activeList.toBuy, ...activeList.toPack].map((item) =>
+              item.name.trim().toLowerCase(),
+            ),
+          );
 
-            // Merge toPack items
-            state.lists[sourceId].toPack.forEach((item) => {
-              if (!activeNames.has(item.name.trim().toLowerCase())) {
-                state.lists[state.activeList!].toPack.push({ ...item });
-                activeNames.add(item.name.trim().toLowerCase());
-              }
-            });
+          state.lists[sourceId].toBuy.forEach((item) => {
+            if (!activeNames.has(item.name.trim().toLowerCase())) {
+              activeList.toBuy.push({ ...item });
+              activeNames.add(item.name.trim().toLowerCase());
+            }
+          });
 
-            // Do NOT merge suggestions from the source list
-          }
+          state.lists[sourceId].toPack.forEach((item) => {
+            if (!activeNames.has(item.name.trim().toLowerCase())) {
+              activeList.toPack.push({ ...item });
+              activeNames.add(item.name.trim().toLowerCase());
+            }
+          });
         });
       },
 

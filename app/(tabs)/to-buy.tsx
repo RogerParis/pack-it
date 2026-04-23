@@ -9,7 +9,7 @@ import { usePackingStore } from '@/store/packingStore';
 import { PackingItem } from '@/types/packing';
 import { v4 as uuid } from 'uuid';
 export default function ToBuyScreen() {
-  const { addItem, removeItem, copyItem } = usePackingStore();
+  const { addItem, removeItem, moveItem } = usePackingStore();
 
   const toBuy = usePackingStore((state) => {
     const activeList = state.activeList;
@@ -50,12 +50,15 @@ export default function ToBuyScreen() {
     [addItem, removeItem, toBuy, toPack],
   );
 
-  const renderItem = ({ item }: { item: PackingItem }) => (
-    <PackingListItem
-      item={item}
-      onDelete={() => removeItem('toBuy', item.id)}
-      onMoveToPack={() => copyItem('toBuy', 'toPack', item.id)}
-    />
+  const renderItem = useCallback(
+    ({ item }: { item: PackingItem }) => (
+      <PackingListItem
+        item={item}
+        onDelete={() => removeItem('toBuy', item.id)}
+        onMoveToPack={() => moveItem('toBuy', 'toPack', item.id)}
+      />
+    ),
+    [removeItem, moveItem],
   );
 
   return (
