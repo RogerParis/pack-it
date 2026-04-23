@@ -122,9 +122,9 @@ Removed `console.log` from `ai.service.ts` and `groq_ai.service.ts`. Kept `conso
 
 ### 14. Prompt injection
 **Files:** All AI services
-**Status:** Open
+**Status:** Resolved
 
-User-supplied `location`/activities interpolated directly into prompts. Sanitize/truncate before injection.
+Added `sanitize()` to both `groq_ai.service.ts` and `vertexai.service.ts` — strips newlines and caps at 200 chars before interpolation.
 
 ---
 

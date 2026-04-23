@@ -1,5 +1,7 @@
 import Constants from 'expo-constants';
 
+import { sanitizePromptInput } from '@/utils/string.utils';
+
 import axios from 'axios';
 
 const GROQ_API_KEY = Constants.expoConfig?.extra?.GROQ_API_KEY;
@@ -19,10 +21,10 @@ export const getPackingSuggestionsFromAI = async (
 I am preparing for a trip and need to create a packing list.
 
 Here are the trip details:
-- Destination: ${location || 'Unknown'}
+- Destination: ${sanitizePromptInput(location) || 'Unknown'}
 - Start Date: ${startDate ? startDate.toDateString() : 'Unknown'}
 - End Date: ${endDate ? endDate.toDateString() : 'Unknown'}
-- Activities: ${activities || 'None'}
+- Activities: ${sanitizePromptInput(activities) || 'None'}
 - Weather forecast: ${weather || 'No forecast'}
 
 Please provide a simple, plain list of packing items. One item per line. Do not include categories, numbers, or extra formatting.
