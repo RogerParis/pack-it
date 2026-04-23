@@ -11,7 +11,7 @@ import { PackingItem } from '@/types/packing';
 import { v4 as uuid } from 'uuid';
 
 export default function ToPackScreen() {
-  const { togglePacked, removeItem, copyItem, addItem } = usePackingStore();
+  const { togglePacked, removeItem, moveItem, addItem } = usePackingStore();
 
   const toPack = usePackingStore((state) => {
     const activeList = state.activeList;
@@ -69,10 +69,10 @@ export default function ToPackScreen() {
         item={item}
         onPress={() => togglePacked(item.id)}
         onDelete={() => removeItem('toPack', item.id)}
-        onMoveToBuy={() => copyItem('toPack', 'toBuy', item.id)}
+        onMoveToBuy={() => moveItem('toPack', 'toBuy', item.id)}
       />
     ),
-    [togglePacked, removeItem, copyItem],
+    [togglePacked, removeItem, moveItem],
   );
 
   return (

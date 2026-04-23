@@ -55,9 +55,9 @@ Weather and AI service calls missing try/catch. Fixed in `suggestions.tsx` — e
 
 ### 6. `copyItem` is actually `moveItem`
 **File:** `store/packingStore.ts:98`
-**Status:** Open
+**Status:** Resolved
 
-Uses `splice()` — removes from source. Misleading name will cause bugs if someone adds a real copy feature later. Rename to `moveItem`.
+Renamed to `moveItem` in store and all callers (to-pack.tsx, to-buy.tsx, suggestions.tsx).
 
 ---
 

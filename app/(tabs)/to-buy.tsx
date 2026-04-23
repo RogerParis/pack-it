@@ -9,7 +9,7 @@ import { usePackingStore } from '@/store/packingStore';
 import { PackingItem } from '@/types/packing';
 import { v4 as uuid } from 'uuid';
 export default function ToBuyScreen() {
-  const { addItem, removeItem, copyItem } = usePackingStore();
+  const { addItem, removeItem, moveItem } = usePackingStore();
 
   const toBuy = usePackingStore((state) => {
     const activeList = state.activeList;
@@ -54,7 +54,7 @@ export default function ToBuyScreen() {
     <PackingListItem
       item={item}
       onDelete={() => removeItem('toBuy', item.id)}
-      onMoveToPack={() => copyItem('toBuy', 'toPack', item.id)}
+      onMoveToPack={() => moveItem('toBuy', 'toPack', item.id)}
     />
   );
 

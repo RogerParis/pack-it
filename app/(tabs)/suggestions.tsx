@@ -18,7 +18,7 @@ export default function SuggestionsScreen() {
     return activeList ? state.lists[activeList].suggestions : [];
   });
   const clearList = usePackingStore((state) => state.clearList);
-  const copyItem = usePackingStore((state) => state.copyItem);
+  const moveItem = usePackingStore((state) => state.moveItem);
   const removeItem = usePackingStore((state) => state.removeItem);
   const toBuy = usePackingStore((state) => {
     const activeList = state.activeList;
@@ -102,17 +102,17 @@ export default function SuggestionsScreen() {
       <PackingListItem
         item={item}
         onMoveToBuy={() => {
-          copyItem('suggestions', 'toBuy', item.id);
+          moveItem('suggestions', 'toBuy', item.id);
           removeItem('suggestions', item.id);
         }}
         onMoveToPack={() => {
-          copyItem('suggestions', 'toPack', item.id);
+          moveItem('suggestions', 'toPack', item.id);
           removeItem('suggestions', item.id);
         }}
         onDelete={() => removeItem('suggestions', item.id)}
       />
     ),
-    [copyItem, removeItem],
+    [moveItem, removeItem],
   );
 
   return (
