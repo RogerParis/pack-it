@@ -39,17 +39,17 @@ OPENAI_API_KEY and GROQ_API_KEY sent directly from device. Anyone can intercept 
 
 ### 4. Concurrent generation race
 **File:** `app/(tabs)/suggestions.tsx:56-86`
-**Status:** Open
+**Status:** Resolved
 
-`clearList('suggestions')` + `addItem` loop has no lock. Two rapid taps corrupt list state. Add a `generating` boolean guard.
+`clearList('suggestions')` + `addItem` loop had no lock. Fixed with `isGenerating` ref guard — concurrent calls return early.
 
 ---
 
 ### 5. Unhandled rejections in AI calls
 **Files:** `app/(tabs)/suggestions.tsx:47-62`, `services/vertexai.service.ts:29-32`
-**Status:** Open
+**Status:** Partially resolved
 
-Weather and AI service calls missing try/catch. Silent failure with no user feedback.
+Weather and AI service calls missing try/catch. Fixed in `suggestions.tsx` — AI call wrapped in try/catch with error alert shown to user. `vertexai.service.ts` still unhandled.
 
 ---
 
@@ -156,7 +156,7 @@ Zero test files. Store mutations, sync logic, auth flows — none covered. Add J
 | Severity | Total | Open | Resolved |
 |----------|-------|------|----------|
 | Critical | 3     | 1    | 2        |
-| High     | 4     | 4    | 0        |
+| High     | 4     | 2    | 2        |
 | Medium   | 5     | 5    | 0        |
 | Low      | 5     | 5    | 0        |
-| **Total**| **17**| **15**| **2**   |
+| **Total**| **17**| **13**| **4**   |
