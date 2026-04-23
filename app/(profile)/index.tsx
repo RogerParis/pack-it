@@ -93,11 +93,11 @@ export default function ProfileScreen() {
   };
 
   const handleMergeList = (id: string) => {
-    if (id === activeList) {
+    if (id === activeList || !activeList) {
       return;
     }
 
-    showMergeListAlert(lists[id].name, lists[activeList!].name, () => {
+    showMergeListAlert(lists[id].name, lists[activeList].name, () => {
       mergeList(id);
       showMergeSuccessAlert();
     });
@@ -120,9 +120,7 @@ export default function ProfileScreen() {
 
         <View style={styles.card}>
           <Text style={styles.label}>Active List: </Text>
-          <Text style={styles.listName}>
-            {lists[Object.keys(lists).find((key) => key === activeList)!].name}
-          </Text>
+          <Text style={styles.listName}>{activeList ? lists[activeList]?.name : ''}</Text>
           <TouchableOpacity onPress={() => setPickerVisible(true)} style={styles.buttonAlt}>
             <Text style={styles.buttonText}>Select Another List</Text>
           </TouchableOpacity>

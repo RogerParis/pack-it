@@ -73,9 +73,9 @@ Wrapped in `useCallback` with `[removeItem, moveItem]` deps.
 
 ### 8. Non-null assertion without safety
 **File:** `app/(profile)/index.tsx:124`
-**Status:** Open
+**Status:** Resolved
 
-`lists[...key!]` crashes if `activeList` not found. Use optional chaining.
+Replaced `lists[...key!]` with `activeList ? lists[activeList]?.name : ''`. Also fixed second `!` in `handleMergeList` with early return guard.
 
 ---
 
