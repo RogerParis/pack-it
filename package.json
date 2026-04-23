@@ -67,9 +67,10 @@
   "jest": {
     "preset": "jest-expo",
     "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*|uuid)"
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*)"
     ],
     "moduleNameMapper": {
+      "^uuid$": "<rootDir>/node_modules/uuid/dist/cjs/index.js",
       "^@/(.*)$": "<rootDir>/$1"
     },
     "setupFiles": [
