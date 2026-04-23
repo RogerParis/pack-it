@@ -63,9 +63,9 @@ Renamed to `moveItem` in store and all callers (to-pack.tsx, to-buy.tsx, suggest
 
 ### 7. `renderItem` not memoized in to-buy
 **File:** `app/(tabs)/to-buy.tsx:53`
-**Status:** Open
+**Status:** Resolved
 
-Unlike `to-pack.tsx`, no `useCallback`. Unnecessary re-renders on any state change.
+Wrapped in `useCallback` with `[removeItem, moveItem]` deps.
 
 ---
 

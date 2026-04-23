@@ -50,12 +50,15 @@ export default function ToBuyScreen() {
     [addItem, removeItem, toBuy, toPack],
   );
 
-  const renderItem = ({ item }: { item: PackingItem }) => (
-    <PackingListItem
-      item={item}
-      onDelete={() => removeItem('toBuy', item.id)}
-      onMoveToPack={() => moveItem('toBuy', 'toPack', item.id)}
-    />
+  const renderItem = useCallback(
+    ({ item }: { item: PackingItem }) => (
+      <PackingListItem
+        item={item}
+        onDelete={() => removeItem('toBuy', item.id)}
+        onMoveToPack={() => moveItem('toBuy', 'toPack', item.id)}
+      />
+    ),
+    [removeItem, moveItem],
   );
 
   return (
