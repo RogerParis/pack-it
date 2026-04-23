@@ -81,9 +81,9 @@ Replaced `lists[...key!]` with `activeList ? lists[activeList]?.name : ''`. Also
 
 ### 9. Collision-prone IDs
 **File:** `app/(tabs)/suggestions.tsx:80`
-**Status:** Open
+**Status:** Resolved
 
-`Date.now() + item` string — same-millisecond items in a batch get duplicate IDs. Use `uuid`.
+Replaced `Date.now()-${item}` with `uuid()`.
 
 ---
 

@@ -10,6 +10,7 @@ import { PackingItem } from '../../types/packing';
 import { getPackingSuggestionsFromAI } from '@/services/groq_ai.service';
 import { getWeatherForecast } from '@/services/weather.service';
 import { useAlertStore } from '@/store/alertStore';
+import { v4 as uuid } from 'uuid';
 
 export default function SuggestionsScreen() {
   const addItem = usePackingStore((state) => state.addItem);
@@ -78,7 +79,7 @@ export default function SuggestionsScreen() {
 
         aiSuggestions.forEach((item: string) => {
           addItem('suggestions', {
-            id: `${Date.now()}-${item}`,
+            id: uuid(),
             name: item,
             packed: false,
           });
