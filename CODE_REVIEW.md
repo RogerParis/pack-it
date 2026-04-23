@@ -21,17 +21,17 @@ OPENAI_API_KEY and GROQ_API_KEY sent directly from device. Anyone can intercept 
 
 ### 2. Race condition in cloud sync
 **File:** `app/_layout.tsx:24-46`
-**Status:** Open
+**Status:** Resolved
 
-`onUserAuthStateChanged` fires multiple times. Concurrent `getUserPackingData`/`saveUserPackingData` calls can race and overwrite local data. Add a sync mutex flag.
+`onUserAuthStateChanged` fires multiple times. Concurrent `getUserPackingData`/`saveUserPackingData` calls can race and overwrite local data. Fixed with `isSyncing` ref guard.
 
 ---
 
 ### 3. No error handling on Firestore fetch
 **File:** `app/_layout.tsx:29-30`
-**Status:** Open
+**Status:** Resolved
 
-`getUserPackingData()` unwrapped — Firestore unavailability crashes app, loses local data. Wrap in try/catch and fall back to local state.
+`getUserPackingData()` unwrapped — Firestore unavailability crashes app, loses local data. Fixed with try/catch — errors logged, local state preserved on failure.
 
 ---
 
@@ -155,8 +155,8 @@ Zero test files. Store mutations, sync logic, auth flows — none covered. Add J
 
 | Severity | Total | Open | Resolved |
 |----------|-------|------|----------|
-| Critical | 3     | 3    | 0        |
+| Critical | 3     | 1    | 2        |
 | High     | 4     | 4    | 0        |
 | Medium   | 5     | 5    | 0        |
 | Low      | 5     | 5    | 0        |
-| **Total**| **17**| **17**| **0**   |
+| **Total**| **17**| **15**| **2**   |

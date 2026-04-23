@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -19,24 +19,32 @@ export default function RootLayout() {
   const user = useAuthStore((state) => state.user);
   const replaceAllData = usePackingStore((state) => state.replaceAllData);
   const setLastSyncedAt = usePackingStore((state) => state.setLastSyncedAt);
-  // Watch for Firebase login state and sync data
+  const isSyncing = useRef(false);
+
   useEffect(() => {
     const unsubscribe = onUserAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser.uid);
 
-        // Try to get Firestore data
-        const cloudData = await getUserPackingData(firebaseUser.uid);
-        if (cloudData) {
-          replaceAllData(cloudData.lists);
-          setLastSyncedAt(
-            cloudData.lastSyncedAt
-              ? new Date(cloudData.lastSyncedAt.seconds * 1000).getTime()
-              : Date.now(),
-          );
-        } else {
-          // No data → upload local MMKV data
-          await saveUserPackingData(firebaseUser.uid);
+        if (isSyncing.current) return;
+        isSyncing.current = true;
+
+        try {
+          const cloudData = await getUserPackingData(firebaseUser.uid);
+          if (cloudData) {
+            replaceAllData(cloudData.lists);
+            setLastSyncedAt(
+              cloudData.lastSyncedAt
+                ? new Date(cloudData.lastSyncedAt.seconds * 1000).getTime()
+                : Date.now(),
+            );
+          } else {
+            await saveUserPackingData(firebaseUser.uid);
+          }
+        } catch (error) {
+          console.error('Failed to sync data:', error);
+        } finally {
+          isSyncing.current = false;
         }
       } else {
         setUser(null);
