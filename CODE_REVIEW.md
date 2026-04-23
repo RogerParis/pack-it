@@ -129,9 +129,12 @@ Added `sanitize()` to both `groq_ai.service.ts` and `vertexai.service.ts` — st
 ---
 
 ### 15. No tests
-**Status:** Open
+**Status:** Resolved
 
-Zero test files. Store mutations, sync logic, auth flows — none covered. Add Jest unit tests for store and services at minimum.
+Added 34 tests across 3 suites:
+- `utils/__tests__/auth.utils.test.ts` — Firebase error code mapping (10 cases)
+- `utils/__tests__/string.utils.test.ts` — prompt input sanitization (7 cases)
+- `store/__tests__/packingStore.test.ts` — store mutations: add, remove, toggle, move, clear, create, delete, merge (17 cases)
 
 ---
 
@@ -158,5 +161,5 @@ Created `utils/auth.utils.ts` with `getFirebaseAuthError()` — maps Firebase er
 | Critical | 3     | 1    | 2        |
 | High     | 4     | 0    | 4        |
 | Medium   | 5     | 0    | 5        |
-| Low      | 5     | 1    | 4        |
-| **Total**| **17**| **2**| **15**  |
+| Low      | 5     | 0    | 5        |
+| **Total**| **17**| **1**| **16**  |

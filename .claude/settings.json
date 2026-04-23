@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "git diff --quiet HEAD || (yarn lint --fix && yarn tsc --noEmit)",
+            "command": "git diff --quiet HEAD || (yarn lint --fix && yarn tsc --noEmit && yarn test)",
             "timeout": 240,
             "statusMessage": "Running lint & type check..."
           }
