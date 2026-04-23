@@ -137,9 +137,9 @@ Zero test files. Store mutations, sync logic, auth flows — none covered. Add J
 
 ### 16. Unsafe `!` assertions
 **Files:** Multiple components
-**Status:** Open
+**Status:** Resolved
 
-`strict: true` is set but non-null assertions bypass it. Replace with optional chaining.
+Fixed `packingStore.ts` `mergeList` — replaced `state.activeList!` with a local `activeId` variable. Profile screen fixed in #8.
 
 ---
 
