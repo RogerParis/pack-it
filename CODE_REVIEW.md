@@ -114,9 +114,9 @@ Extracted shared styles to `app/(auth)/auth.styles.ts`. All three screens import
 
 ### 13. Console logs in production
 **Files:** Multiple service files
-**Status:** Open
+**Status:** Resolved
 
-Some log full API responses. Use leveled logger, strip in prod.
+Removed `console.log` from `ai.service.ts` and `groq_ai.service.ts`. Kept `console.warn` for missing API keys (dev only) and `console.error` in catch blocks.
 
 ---
 
