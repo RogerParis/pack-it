@@ -7,7 +7,11 @@ import AddPackingItemInput from '@/components/add_packing_item_input.component';
 import BigSuitcase from '@/components/big_suitcase.component';
 import ScreenHeader from '@/components/screen_header.component';
 
-import { showDuplicateItemAlert, showMoveItemAlert } from '@/services/alerts.service';
+import {
+  showDeleteCategoryAlert,
+  showDuplicateItemAlert,
+  showMoveItemAlert,
+} from '@/services/alerts.service';
 import { usePackingStore } from '@/store/packingStore';
 import { CAT_TINT, COLORS } from '@/theme/colors';
 import { PackingItem } from '@/types/packing';
@@ -39,12 +43,14 @@ function CategoryCard({
   onToggle,
   onMoveToBuy,
   onDelete,
+  onDeleteCategory,
 }: {
   category: string;
   items: PackingItem[];
   onToggle: (id: string) => void;
   onMoveToBuy: (id: string) => void;
   onDelete: (id: string) => void;
+  onDeleteCategory: () => void;
 }) {
   const [expanded, setExpanded] = useState(true);
   const tintBg = (CAT_TINT as Record<string, { bg: string }>)[category]?.bg ?? COLORS.sand;
@@ -90,6 +96,12 @@ function CategoryCard({
             </Text>
           </View>
         </View>
+        <TouchableOpacity
+          onPress={onDeleteCategory}
+          activeOpacity={0.7}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 4 }}>
+          <Feather name="trash-2" size={14} color={COLORS.mute} />
+        </TouchableOpacity>
         <Feather name={expanded ? 'chevron-down' : 'chevron-right'} size={14} color={COLORS.mute} />
       </TouchableOpacity>
 
@@ -129,7 +141,7 @@ function CategoryCard({
 }
 
 export default function ToPackScreen() {
-  const { togglePacked, removeItem, moveItem, addItem } = usePackingStore();
+  const { togglePacked, removeItem, moveItem, addItem, clearCategory } = usePackingStore();
   const [selectedCategory, setSelectedCategory] = useState<string>('extras');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [customInput, setCustomInput] = useState('');
@@ -228,6 +240,13 @@ export default function ToPackScreen() {
       removeItem('toPack', id);
     },
     [removeItem],
+  );
+
+  const handleDeleteCategory = useCallback(
+    (category: string) => {
+      showDeleteCategoryAlert(categoryLabel(category), () => clearCategory(category));
+    },
+    [clearCategory],
   );
 
   const confirmCustomCategory = useCallback(() => {
@@ -339,6 +358,7 @@ export default function ToPackScreen() {
             onToggle={togglePacked}
             onMoveToBuy={handleMoveToBuy}
             onDelete={handleDelete}
+            onDeleteCategory={() => handleDeleteCategory(cat)}
           />
         ))}
 

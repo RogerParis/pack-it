@@ -13,7 +13,8 @@ const firestore = getFirestore();
 
 export const saveUserPackingData = async (uid: string) => {
   const { lists } = usePackingStore.getState();
-  usePackingStore.getState().setLastSyncedAt(Date.now());
+  const now = Date.now();
+  usePackingStore.getState().setLastSyncedAt(now);
 
   const docRef = doc(collection(firestore, 'users'), uid);
   await setDoc(docRef, {

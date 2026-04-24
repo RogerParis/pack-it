@@ -42,12 +42,17 @@ export default function RootLayout() {
         try {
           const cloudData = await getUserPackingData(firebaseUser.uid);
           if (cloudData) {
-            replaceAllData(cloudData.lists);
-            setLastSyncedAt(
-              cloudData.lastSyncedAt
-                ? new Date(cloudData.lastSyncedAt.seconds * 1000).getTime()
-                : Date.now(),
-            );
+            const localLastSynced = usePackingStore.getState().lastSyncedAt ?? 0;
+            const cloudLastSynced = cloudData.lastSyncedAt
+              ? new Date(cloudData.lastSyncedAt.seconds * 1000).getTime()
+              : 0;
+
+            if (cloudLastSynced > localLastSynced) {
+              replaceAllData(cloudData.lists);
+              setLastSyncedAt(cloudLastSynced);
+            } else {
+              await saveUserPackingData(firebaseUser.uid);
+            }
           } else {
             await saveUserPackingData(firebaseUser.uid);
           }

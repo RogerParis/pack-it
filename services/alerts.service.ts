@@ -41,6 +41,17 @@ export const showDeleteItemAlert = (onDelete: () => void) => {
   });
 };
 
+export const showDeleteCategoryAlert = (categoryName: string, onDelete: () => void) => {
+  showAlert({
+    title: `Delete "${categoryName}"?`,
+    message: 'This will permanently remove all items in this category.',
+    buttons: [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: onDelete },
+    ],
+  });
+};
+
 export const showDeleteListAlert = (onDelete: () => void) => {
   showAlert({
     title: 'Delete List',

@@ -23,6 +23,7 @@ type PackingState = {
   moveItem: (fromList: ListType, toList: ListType, id: string) => void;
   removeItem: (type: ListType, id: string) => void;
   clearList: (type: ListType) => void;
+  clearCategory: (category: string) => void;
   clearAllLists: () => void;
   lastSyncedAt: number | null;
   setLastSyncedAt: (ts: number) => void;
@@ -116,6 +117,16 @@ export const usePackingStore = create<PackingState>()(
         set((state) => {
           if (state.activeList) {
             state.lists[state.activeList][type] = [];
+          }
+        });
+      },
+
+      clearCategory: (category) => {
+        set((state) => {
+          if (state.activeList) {
+            state.lists[state.activeList].toPack = state.lists[state.activeList].toPack.filter(
+              (item) => item.category !== category,
+            );
           }
         });
       },
