@@ -1,22 +1,27 @@
-import React, { useCallback } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Feather } from '@expo/vector-icons';
 
 import AddPackingItemInput from '@/components/add_packing_item_input.component';
+import CategoryCard from '@/components/category_card.component';
 import CategoryPicker from '@/components/category_picker.component';
-import PackingListItem from '@/components/packing_list_item.component';
 import ScreenHeader from '@/components/screen_header.component';
+import { categoryLabel, groupByCategory, orderCategories } from '@/utils/categories';
 import { useCategoryPicker } from '@/utils/use_category_picker';
 
-import { showDuplicateItemAlert, showMoveItemAlert } from '@/services/alerts.service';
+import {
+  showDeleteCategoryAlert,
+  showDuplicateItemAlert,
+  showMoveItemAlert,
+} from '@/services/alerts.service';
 import { usePackingStore } from '@/store/packingStore';
 import { COLORS } from '@/theme/colors';
 import { PackingItem } from '@/types/packing';
 import { v4 as uuid } from 'uuid';
 
 export default function ToBuyScreen() {
-  const { addItem, removeItem, moveItem, togglePacked } = usePackingStore();
+  const { addItem, removeItem, moveItem, togglePacked, clearCategory } = usePackingStore();
 
   const toBuy = usePackingStore((state) => {
     const activeList = state.activeList;
@@ -29,6 +34,9 @@ export default function ToBuyScreen() {
 
   const bought = toBuy.filter((i) => i.packed).length;
   const total = toBuy.length;
+
+  const grouped = useMemo(() => groupByCategory(toBuy), [toBuy]);
+  const orderedCategories = useMemo(() => orderCategories(grouped), [grouped]);
 
   const {
     selectedCategory,
@@ -76,76 +84,83 @@ export default function ToBuyScreen() {
     [addItem, removeItem, toBuy, toPack, effectiveCategory, afterItemAdded],
   );
 
-  const renderItem = useCallback(
-    ({ item }: { item: PackingItem }) => (
-      <PackingListItem
-        item={item}
-        onPress={() => togglePacked('toBuy', item.id)}
-        onDelete={() => removeItem('toBuy', item.id)}
-        onMoveToPack={() => moveItem('toBuy', 'toPack', item.id)}
-      />
-    ),
-    [togglePacked, removeItem, moveItem],
+  const handleDeleteCategory = useCallback(
+    (category: string) => {
+      showDeleteCategoryAlert(categoryLabel(category), () => clearCategory('toBuy', category));
+    },
+    [clearCategory],
   );
 
   return (
     <View style={styles.screen}>
       <ScreenHeader />
-
-      <FlatList
-        data={toBuy}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={
-          <View style={styles.listHeader}>
-            {/* Coral hero */}
-            <View style={styles.hero}>
-              <View style={styles.heroIcon}>
-                <Feather name="shopping-cart" size={22} color={COLORS.coral} />
-              </View>
-              <View style={styles.heroText}>
-                <Text style={styles.heroLabel}>SHOPPING LIST</Text>
-                <Text style={styles.heroTitle}>
-                  {total - bought} thing{total - bought !== 1 ? 's' : ''} to buy
-                </Text>
-              </View>
-              <View style={styles.heroCounts}>
-                <Text style={styles.heroBought}>{bought}</Text>
-                <Text style={styles.heroTotal}>/{total}</Text>
-              </View>
-            </View>
-
-            {/* Add input */}
-            <AddPackingItemInput
-              onAdd={handleAdd}
-              placeholder="Add something to buy…"
-              accentColor={COLORS.coral}
-            />
-
-            {/* Category picker */}
-            <CategoryPicker
-              displayCategories={displayCategories}
-              selectedCategory={selectedCategory}
-              onSelectCategory={(cat) => {
-                setSelectedCategory(cat);
-                setShowCustomInput(false);
-              }}
-              showCustomInput={showCustomInput}
-              customInput={customInput}
-              customInputRef={customInputRef}
-              onCustomInputChange={setCustomInput}
-              onConfirmCustom={confirmCustomCategory}
-              onOpenCustom={() => setShowCustomInput(true)}
-              onCancelCustom={() => {
-                setShowCustomInput(false);
-                setCustomInput('');
-              }}
-            />
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}>
+        {/* Hero */}
+        <View style={styles.hero}>
+          <View style={styles.heroIcon}>
+            <Feather name="shopping-cart" size={22} color={COLORS.coral} />
           </View>
-        }
-        contentContainerStyle={styles.list}
-      />
+          <View style={styles.heroText}>
+            <Text style={styles.heroLabel}>SHOPPING LIST</Text>
+            <Text style={styles.heroTitle}>
+              {total - bought} thing{total - bought !== 1 ? 's' : ''} to buy
+            </Text>
+          </View>
+          <View style={styles.heroCounts}>
+            <Text style={styles.heroBought}>{bought}</Text>
+            <Text style={styles.heroTotal}>/{total}</Text>
+          </View>
+        </View>
+
+        <AddPackingItemInput
+          onAdd={handleAdd}
+          placeholder="Add something to buy…"
+          accentColor={COLORS.coral}
+        />
+
+        <CategoryPicker
+          displayCategories={displayCategories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={(cat) => {
+            setSelectedCategory(cat);
+            setShowCustomInput(false);
+          }}
+          showCustomInput={showCustomInput}
+          customInput={customInput}
+          customInputRef={customInputRef}
+          onCustomInputChange={setCustomInput}
+          onConfirmCustom={confirmCustomCategory}
+          onOpenCustom={() => setShowCustomInput(true)}
+          onCancelCustom={() => {
+            setShowCustomInput(false);
+            setCustomInput('');
+          }}
+        />
+
+        {orderedCategories.map((cat) => (
+          <CategoryCard
+            key={cat}
+            category={cat}
+            items={grouped[cat] ?? []}
+            moveTarget="toPack"
+            onToggle={(id) => togglePacked('toBuy', id)}
+            onMoveItem={(id) => moveItem('toBuy', 'toPack', id)}
+            onDelete={(id) => removeItem('toBuy', id)}
+            onDeleteCategory={() => handleDeleteCategory(cat)}
+          />
+        ))}
+
+        {total === 0 && (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyText}>Add your first item above</Text>
+          </View>
+        )}
+
+        <View style={{ height: 24 }} />
+      </ScrollView>
     </View>
   );
 }
@@ -155,9 +170,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.paper,
   },
-  listHeader: {
+  scroll: {
+    flex: 1,
+  },
+  content: {
+    padding: 20,
+    paddingTop: 0,
     gap: 12,
-    marginBottom: 4,
   },
   hero: {
     flexDirection: 'row',
@@ -210,9 +229,12 @@ const styles = StyleSheet.create({
     color: COLORS.ink3,
     fontWeight: '400',
   },
-  list: {
-    gap: 10,
-    padding: 20,
-    paddingTop: 0,
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 32,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: COLORS.mute,
   },
 });
