@@ -14,8 +14,8 @@ import { useRouter } from 'expo-router';
 
 import { getFirebaseAuthError } from '@/utils/auth.utils';
 
-import { authStyles as styles } from '@/app/(auth)/auth.styles';
 import { useAuthStore } from '@/store/authStore';
+import { authStyles as styles } from '@/theme/auth.styles';
 
 export default function LoginScreen() {
   const router = useRouter();

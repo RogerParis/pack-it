@@ -14,9 +14,9 @@ import { useRouter } from 'expo-router';
 
 import { getFirebaseAuthError } from '@/utils/auth.utils';
 
-import { authStyles as styles } from '@/app/(auth)/auth.styles';
 import { showPasswordResetSuccessAlert } from '@/services/alerts.service';
 import { resetPassword } from '@/services/auth.service';
+import { authStyles as styles } from '@/theme/auth.styles';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
