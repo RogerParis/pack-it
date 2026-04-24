@@ -84,6 +84,7 @@ export default function SuggestionsScreen() {
             id: uuid(),
             name: item,
             packed: false,
+            category: '',
           });
         });
       } catch (error) {

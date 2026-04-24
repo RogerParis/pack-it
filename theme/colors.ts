@@ -34,6 +34,9 @@ export const COLORS = {
 };
 
 export const CAT_TINT = {
+  clothing: { bg: '#F3F7F4', accent: '#2E7D8A', accentSoft: '#B9D7DB', glyphBg: '#E5F0F1' },
+  documents: { bg: '#FBF2EE', accent: '#E27A5C', accentSoft: '#F6D7CB', glyphBg: '#F9DED3' },
+  tech: { bg: '#F1F3F6', accent: '#24435E', accentSoft: '#C7D2DD', glyphBg: '#DAE2EA' },
   extras: { bg: '#F4F7EF', accent: '#6A8E5F', accentSoft: '#D3DEC8', glyphBg: '#E2EBD6' },
 } as const;
 

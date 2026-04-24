@@ -52,6 +52,7 @@ export default function ToBuyScreen() {
         id: uuid(),
         name,
         packed: false,
+        category: '',
       };
       addItem('toBuy', newItem);
     },

@@ -6,7 +6,7 @@ const initialState = {
   lastSyncedAt: null,
 };
 
-const item = (id: string, name: string) => ({ id, name, packed: false });
+const item = (id: string, name: string) => ({ id, name, packed: false, category: 'extras' });
 
 beforeEach(() => {
   usePackingStore.setState(initialState);

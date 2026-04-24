@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 import { Feather } from '@expo/vector-icons';
 
@@ -13,13 +13,25 @@ import { CAT_TINT, COLORS } from '@/theme/colors';
 import { PackingItem } from '@/types/packing';
 import { v4 as uuid } from 'uuid';
 
-const CATEGORIES = ['clothing', 'documents', 'tech', 'extras'] as const;
+const SUGGESTED_CATEGORIES = ['clothing', 'documents', 'tech', 'extras'] as const;
 const CATEGORY_LABELS: Record<string, string> = {
   clothing: 'Clothing',
   documents: 'Documents',
   tech: 'Tech',
   extras: 'Extras',
 };
+
+function categoryLabel(cat: string) {
+  return CATEGORY_LABELS[cat] ?? cat.charAt(0).toUpperCase() + cat.slice(1);
+}
+
+function categoryAccent(cat: string) {
+  return (CAT_TINT as Record<string, { accent: string }>)[cat]?.accent ?? COLORS.teal;
+}
+
+function categoryGlyphBg(cat: string) {
+  return (CAT_TINT as Record<string, { glyphBg: string }>)[cat]?.glyphBg ?? COLORS.tealPale;
+}
 
 function CategoryCard({
   category,
@@ -35,25 +47,26 @@ function CategoryCard({
   onDelete: (id: string) => void;
 }) {
   const [expanded, setExpanded] = useState(true);
-  const tint = CAT_TINT[category as keyof typeof CAT_TINT] || CAT_TINT.extras;
+  const tintBg = (CAT_TINT as Record<string, { bg: string }>)[category]?.bg ?? COLORS.sand;
+  const accent = categoryAccent(category);
+  const glyphBg = categoryGlyphBg(category);
   const packed = items.filter((i) => i.packed).length;
   const total = items.length;
   const pct = total === 0 ? 0 : packed / total;
   const complete = total > 0 && pct === 1;
 
   return (
-    <View style={[styles.card, { backgroundColor: tint.bg }]}>
+    <View style={[styles.card, { backgroundColor: tintBg }]}>
       <TouchableOpacity
         style={styles.cardHeader}
         onPress={() => setExpanded((v) => !v)}
         activeOpacity={0.7}>
-        <View
-          style={[styles.glyphBox, { backgroundColor: complete ? COLORS.leafSoft : tint.glyphBg }]}>
-          <Feather name="package" size={16} color={complete ? COLORS.leaf : tint.accent} />
+        <View style={[styles.glyphBox, { backgroundColor: complete ? COLORS.leafSoft : glyphBg }]}>
+          <Feather name="package" size={16} color={complete ? COLORS.leaf : accent} />
         </View>
         <View style={styles.cardMeta}>
           <View style={styles.cardTitleRow}>
-            <Text style={styles.cardTitle}>{CATEGORY_LABELS[category] ?? category}</Text>
+            <Text style={styles.cardTitle}>{categoryLabel(category)}</Text>
             {complete && (
               <View style={styles.doneBadge}>
                 <Text style={styles.doneBadgeText}>DONE</Text>
@@ -67,7 +80,7 @@ function CategoryCard({
                   styles.progressFill,
                   {
                     width: `${pct * 100}%` as `${number}%`,
-                    backgroundColor: complete ? COLORS.leaf : tint.accent,
+                    backgroundColor: complete ? COLORS.leaf : accent,
                   },
                 ]}
               />
@@ -117,6 +130,10 @@ function CategoryCard({
 
 export default function ToPackScreen() {
   const { togglePacked, removeItem, moveItem, addItem } = usePackingStore();
+  const [selectedCategory, setSelectedCategory] = useState<string>('extras');
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customInput, setCustomInput] = useState('');
+  const customInputRef = useRef<TextInput>(null);
 
   const toPack = usePackingStore((state) => {
     const activeList = state.activeList;
@@ -144,12 +161,22 @@ export default function ToPackScreen() {
 
   const orderedCategories = useMemo(() => {
     const present = new Set(Object.keys(grouped));
-    const ordered: string[] = CATEGORIES.filter((c) => present.has(c));
+    const ordered: string[] = (SUGGESTED_CATEGORIES as readonly string[]).filter((c) =>
+      present.has(c),
+    );
     for (const c of present) {
-      if (!(CATEGORIES as readonly string[]).includes(c)) ordered.push(c);
+      if (!(SUGGESTED_CATEGORIES as readonly string[]).includes(c)) ordered.push(c);
     }
     return ordered;
   }, [grouped]);
+
+  const displayCategories = useMemo(() => {
+    const existing = Array.from(new Set(toPack.map((i) => i.category).filter(Boolean)));
+    const suggested = (SUGGESTED_CATEGORIES as readonly string[]).filter(
+      (c) => !existing.includes(c),
+    );
+    return [...existing, ...suggested];
+  }, [toPack]);
 
   const handleAdd = useCallback(
     (name: string) => {
@@ -171,15 +198,22 @@ export default function ToPackScreen() {
         });
         return;
       }
+      const pendingCustom = customInput.trim().toLowerCase();
+      const category = showCustomInput && pendingCustom ? pendingCustom : selectedCategory;
+      if (showCustomInput && pendingCustom) {
+        setSelectedCategory(pendingCustom);
+      }
       const newItem: PackingItem = {
         id: uuid(),
         name,
         packed: false,
-        category: 'extras',
+        category,
       };
       addItem('toPack', newItem);
+      setShowCustomInput(false);
+      setCustomInput('');
     },
-    [addItem, removeItem, toPack, toBuy],
+    [addItem, removeItem, toPack, toBuy, selectedCategory, showCustomInput, customInput],
   );
 
   const handleMoveToBuy = useCallback(
@@ -195,6 +229,15 @@ export default function ToPackScreen() {
     },
     [removeItem],
   );
+
+  const confirmCustomCategory = useCallback(() => {
+    const trimmed = customInput.trim().toLowerCase();
+    if (trimmed) {
+      setSelectedCategory(trimmed);
+    }
+    setCustomInput('');
+    setShowCustomInput(false);
+  }, [customInput]);
 
   return (
     <View style={styles.screen}>
@@ -226,6 +269,66 @@ export default function ToPackScreen() {
         <View style={styles.inputWrapper}>
           <AddPackingItemInput onAdd={handleAdd} />
         </View>
+
+        {/* Category picker */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoryPicker}>
+          {displayCategories.map((cat) => {
+            const active = selectedCategory === cat;
+            const accent = categoryAccent(cat);
+            const glyphBg = categoryGlyphBg(cat);
+            return (
+              <TouchableOpacity
+                key={cat}
+                style={[styles.categoryPill, { backgroundColor: active ? accent : glyphBg }]}
+                onPress={() => {
+                  setSelectedCategory(cat);
+                  setShowCustomInput(false);
+                }}
+                activeOpacity={0.7}>
+                <Text style={[styles.categoryPillText, { color: active ? '#fff' : accent }]}>
+                  {categoryLabel(cat)}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+          {showCustomInput ? (
+            <View style={styles.customInputRow}>
+              <TextInput
+                ref={customInputRef}
+                value={customInput}
+                onChangeText={setCustomInput}
+                placeholder="Category name…"
+                placeholderTextColor={COLORS.mute}
+                style={styles.customInput}
+                autoFocus
+                returnKeyType="done"
+                onSubmitEditing={confirmCustomCategory}
+              />
+              <TouchableOpacity onPress={confirmCustomCategory} activeOpacity={0.7}>
+                <Feather name="check" size={16} color={COLORS.teal} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setShowCustomInput(false);
+                  setCustomInput('');
+                }}
+                activeOpacity={0.7}>
+                <Feather name="x" size={16} color={COLORS.mute} />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.addCategoryPill}
+              onPress={() => setShowCustomInput(true)}
+              activeOpacity={0.7}>
+              <Feather name="plus" size={13} color={COLORS.ink3} />
+              <Text style={styles.addCategoryPillText}>New</Text>
+            </TouchableOpacity>
+          )}
+        </ScrollView>
 
         {/* Category groups */}
         {orderedCategories.map((cat) => (
@@ -312,6 +415,57 @@ const styles = StyleSheet.create({
 
   // Input
   inputWrapper: {},
+
+  // Category picker
+  categoryPicker: {
+    gap: 8,
+    paddingBottom: 2,
+  },
+  categoryPill: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  categoryPillText: {
+    fontSize: 12,
+    fontWeight: '600',
+    letterSpacing: 0.1,
+  },
+  addCategoryPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: COLORS.line,
+  },
+  addCategoryPillText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.ink3,
+  },
+  customInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+    backgroundColor: COLORS.sand,
+    borderWidth: 1,
+    borderColor: COLORS.line,
+  },
+  customInput: {
+    fontSize: 12.5,
+    color: COLORS.ink,
+    minWidth: 100,
+    paddingVertical: 0,
+  },
 
   // Category card
   card: {
