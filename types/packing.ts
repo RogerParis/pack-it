@@ -2,6 +2,7 @@ export type PackingItem = {
   id: string;
   name: string;
   packed: boolean;
+  category: string;
 };
 
 export type ListType = 'toBuy' | 'toPack' | 'suggestions';

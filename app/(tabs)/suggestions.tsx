@@ -2,6 +2,7 @@ import React, { useCallback, useRef } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import PackingListItem from '@/components/packing_list_item.component';
+import ScreenHeader from '@/components/screen_header.component';
 import SuggestionsListHeader from '@/components/suggestions_list_header.component';
 
 import { usePackingStore } from '../../store/packingStore';
@@ -10,6 +11,7 @@ import { PackingItem } from '../../types/packing';
 import { getPackingSuggestionsFromAI } from '@/services/groq_ai.service';
 import { getWeatherForecast } from '@/services/weather.service';
 import { useAlertStore } from '@/store/alertStore';
+import { COLORS } from '@/theme/colors';
 import { v4 as uuid } from 'uuid';
 
 export default function SuggestionsScreen() {
@@ -117,19 +119,58 @@ export default function SuggestionsScreen() {
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.screen}>
+      <ScreenHeader />
       <FlatList
-        ListHeaderComponent={<SuggestionsListHeader onGenerate={handleGenerate} />}
+        ListHeaderComponent={
+          <View style={styles.listHeader}>
+            <SuggestionsListHeader onGenerate={handleGenerate} />
+
+            {suggestions.length > 0 && (
+              <Text style={styles.sectionLabel}>SMART PICKS · {suggestions.length}</Text>
+            )}
+          </View>
+        }
         data={suggestions}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        ListEmptyComponent={<Text>No suggestions yet.</Text>}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No suggestions yet. Fill in your trip details above.</Text>
+        }
         contentContainerStyle={styles.list}
+        showsVerticalScrollIndicator={false}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  list: { gap: 12, margin: 16 },
+  screen: {
+    flex: 1,
+    backgroundColor: COLORS.paper,
+  },
+  listHeader: {
+    gap: 12,
+    marginBottom: 4,
+  },
+  sectionLabel: {
+    fontSize: 10,
+    color: COLORS.mute,
+    letterSpacing: 1.2,
+    fontWeight: '600',
+    marginLeft: 4,
+    marginTop: 4,
+  },
+  list: {
+    gap: 10,
+    padding: 20,
+    paddingTop: 0,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: COLORS.mute,
+    textAlign: 'center',
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+  },
 });

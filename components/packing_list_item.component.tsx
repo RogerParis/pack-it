@@ -4,9 +4,8 @@ import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 
 import { Feather } from '@expo/vector-icons';
 
-import { COLORS } from '../theme/colors';
-
 import { showDeleteItemAlert } from '@/services/alerts.service';
+import { COLORS } from '@/theme/colors';
 import { PackingItem } from '@/types/packing';
 
 type Props = {
@@ -22,26 +21,26 @@ const PackingListItem = ({ item, onDelete, onMoveToPack, onMoveToBuy, onPress }:
     <View style={styles.actionsContainer}>
       {onMoveToPack && (
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: COLORS.secondary }]}
+          style={[styles.actionButton, { backgroundColor: COLORS.teal }]}
           onPress={onMoveToPack}
-          activeOpacity={0.5}>
-          <Feather name="briefcase" size={24} color={COLORS.white} />
+          activeOpacity={0.75}>
+          <Feather name="briefcase" size={20} color="#fff" />
         </TouchableOpacity>
       )}
       {onMoveToBuy && (
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: COLORS.primary }]}
+          style={[styles.actionButton, { backgroundColor: COLORS.coral }]}
           onPress={onMoveToBuy}
-          activeOpacity={0.5}>
-          <Feather name="shopping-cart" size={24} color={COLORS.white} />
+          activeOpacity={0.75}>
+          <Feather name="shopping-cart" size={20} color="#fff" />
         </TouchableOpacity>
       )}
       {onDelete && (
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: COLORS.error }]}
+          style={[styles.actionButton, { backgroundColor: COLORS.ink }]}
           onPress={() => showDeleteItemAlert(onDelete)}
-          activeOpacity={0.5}>
-          <Feather name="trash-2" size={24} color={COLORS.white} />
+          activeOpacity={0.75}>
+          <Feather name="trash-2" size={20} color="#fff" />
         </TouchableOpacity>
       )}
     </View>
@@ -49,8 +48,11 @@ const PackingListItem = ({ item, onDelete, onMoveToPack, onMoveToBuy, onPress }:
 
   return (
     <Swipeable renderRightActions={renderRightActions}>
-      <TouchableOpacity onPress={onPress} activeOpacity={0.5}>
-        <View style={styles.item}>
+      <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+        <View style={[styles.item, item.packed && styles.itemPacked]}>
+          <View style={[styles.checkbox, item.packed && styles.checkboxPacked]}>
+            {item.packed && <Feather name="check" size={12} color="#fff" />}
+          </View>
           <Text style={[styles.itemText, item.packed && styles.packedText]}>{item.name}</Text>
         </View>
       </TouchableOpacity>
@@ -62,26 +64,58 @@ export default React.memo(PackingListItem);
 
 const styles = StyleSheet.create({
   item: {
-    padding: 14,
-    backgroundColor: COLORS.background,
-    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 13,
+    paddingHorizontal: 14,
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.line,
+  },
+  itemPacked: {
+    backgroundColor: COLORS.paper,
+    borderStyle: 'dashed',
+    borderColor: COLORS.lineSoft,
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 7,
+    borderWidth: 1.5,
+    borderColor: COLORS.mute,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  checkboxPacked: {
+    backgroundColor: COLORS.teal,
+    borderColor: COLORS.teal,
   },
   itemText: {
-    fontSize: 18,
-    color: COLORS.text,
+    flex: 1,
+    fontSize: 14.5,
+    fontWeight: '500',
+    color: COLORS.ink,
   },
   packedText: {
     textDecorationLine: 'line-through',
-    color: COLORS.neutral500,
+    color: COLORS.mute,
+    fontWeight: '400',
   },
   actionsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
+    paddingLeft: 10,
     height: '100%',
   },
   actionButton: {
-    padding: 12,
-    marginHorizontal: 4,
-    borderRadius: 8,
+    width: 48,
+    height: '100%',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

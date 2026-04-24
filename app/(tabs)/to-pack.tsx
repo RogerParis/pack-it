@@ -1,14 +1,119 @@
-import React, { useCallback, useMemo } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import { Feather } from '@expo/vector-icons';
 
 import AddPackingItemInput from '@/components/add_packing_item_input.component';
-import PackingListItem from '@/components/packing_list_item.component';
+import BigSuitcase from '@/components/big_suitcase.component';
+import ScreenHeader from '@/components/screen_header.component';
 
 import { showDuplicateItemAlert, showMoveItemAlert } from '@/services/alerts.service';
 import { usePackingStore } from '@/store/packingStore';
-import { COLORS } from '@/theme/colors';
+import { CAT_TINT, COLORS } from '@/theme/colors';
 import { PackingItem } from '@/types/packing';
 import { v4 as uuid } from 'uuid';
+
+const CATEGORIES = ['clothing', 'documents', 'tech', 'extras'] as const;
+const CATEGORY_LABELS: Record<string, string> = {
+  clothing: 'Clothing',
+  documents: 'Documents',
+  tech: 'Tech',
+  extras: 'Extras',
+};
+
+function CategoryCard({
+  category,
+  items,
+  onToggle,
+  onMoveToBuy,
+  onDelete,
+}: {
+  category: string;
+  items: PackingItem[];
+  onToggle: (id: string) => void;
+  onMoveToBuy: (id: string) => void;
+  onDelete: (id: string) => void;
+}) {
+  const [expanded, setExpanded] = useState(true);
+  const tint = CAT_TINT[category as keyof typeof CAT_TINT] || CAT_TINT.extras;
+  const packed = items.filter((i) => i.packed).length;
+  const total = items.length;
+  const pct = total === 0 ? 0 : packed / total;
+  const complete = total > 0 && pct === 1;
+
+  return (
+    <View style={[styles.card, { backgroundColor: tint.bg }]}>
+      <TouchableOpacity
+        style={styles.cardHeader}
+        onPress={() => setExpanded((v) => !v)}
+        activeOpacity={0.7}>
+        <View
+          style={[styles.glyphBox, { backgroundColor: complete ? COLORS.leafSoft : tint.glyphBg }]}>
+          <Feather name="package" size={16} color={complete ? COLORS.leaf : tint.accent} />
+        </View>
+        <View style={styles.cardMeta}>
+          <View style={styles.cardTitleRow}>
+            <Text style={styles.cardTitle}>{CATEGORY_LABELS[category] ?? category}</Text>
+            {complete && (
+              <View style={styles.doneBadge}>
+                <Text style={styles.doneBadgeText}>DONE</Text>
+              </View>
+            )}
+          </View>
+          <View style={styles.progressRow}>
+            <View style={styles.progressBg}>
+              <View
+                style={[
+                  styles.progressFill,
+                  {
+                    width: `${pct * 100}%` as `${number}%`,
+                    backgroundColor: complete ? COLORS.leaf : tint.accent,
+                  },
+                ]}
+              />
+            </View>
+            <Text style={styles.progressCount}>
+              {packed}/{total}
+            </Text>
+          </View>
+        </View>
+        <Feather name={expanded ? 'chevron-down' : 'chevron-right'} size={14} color={COLORS.mute} />
+      </TouchableOpacity>
+
+      {expanded && (
+        <View style={styles.cardBody}>
+          {items.map((item) => (
+            <View key={item.id} style={styles.itemRow}>
+              <TouchableOpacity
+                style={[styles.checkbox, item.packed && styles.checkboxPacked]}
+                onPress={() => onToggle(item.id)}
+                activeOpacity={0.7}>
+                {item.packed && <Feather name="check" size={11} color="#fff" />}
+              </TouchableOpacity>
+              <Text style={[styles.itemName, item.packed && styles.itemNamePacked]}>
+                {item.name}
+              </Text>
+              <View style={styles.itemActions}>
+                <TouchableOpacity
+                  style={[styles.actionChip, { backgroundColor: COLORS.coralSoft }]}
+                  onPress={() => onMoveToBuy(item.id)}
+                  activeOpacity={0.7}>
+                  <Feather name="shopping-cart" size={12} color={COLORS.coral} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.actionChip, { backgroundColor: COLORS.sandDeep }]}
+                  onPress={() => onDelete(item.id)}
+                  activeOpacity={0.7}>
+                  <Feather name="trash-2" size={12} color={COLORS.ink3} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
 
 export default function ToPackScreen() {
   const { togglePacked, removeItem, moveItem, addItem } = usePackingStore();
@@ -24,14 +129,27 @@ export default function ToPackScreen() {
 
   const totalItems = toPack.length;
   const packedItems = toPack.filter((item) => item.packed).length;
-  const progress = totalItems === 0 ? 0 : packedItems / totalItems;
+  const fillRatio = totalItems === 0 ? 0 : packedItems / totalItems;
+  const remaining = totalItems - packedItems;
 
-  const sortedToPack = useMemo(() => {
-    return [...toPack].sort((a, b) => {
-      if (a.packed === b.packed) return 0;
-      return a.packed ? 1 : -1; // unpacked first
-    });
+  const grouped = useMemo(() => {
+    const map: Record<string, PackingItem[]> = {};
+    for (const item of toPack) {
+      const cat = item.category ?? 'extras';
+      if (!map[cat]) map[cat] = [];
+      map[cat].push(item);
+    }
+    return map;
   }, [toPack]);
+
+  const orderedCategories = useMemo(() => {
+    const present = new Set(Object.keys(grouped));
+    const ordered: string[] = CATEGORIES.filter((c) => present.has(c));
+    for (const c of present) {
+      if (!(CATEGORIES as readonly string[]).includes(c)) ordered.push(c);
+    }
+    return ordered;
+  }, [grouped]);
 
   const handleAdd = useCallback(
     (name: string) => {
@@ -57,68 +175,276 @@ export default function ToPackScreen() {
         id: uuid(),
         name,
         packed: false,
+        category: 'extras',
       };
       addItem('toPack', newItem);
     },
     [addItem, removeItem, toPack, toBuy],
   );
 
-  const renderItem = useCallback(
-    ({ item }: { item: PackingItem }) => (
-      <PackingListItem
-        item={item}
-        onPress={() => togglePacked(item.id)}
-        onDelete={() => removeItem('toPack', item.id)}
-        onMoveToBuy={() => moveItem('toPack', 'toBuy', item.id)}
-      />
-    ),
-    [togglePacked, removeItem, moveItem],
+  const handleMoveToBuy = useCallback(
+    (id: string) => {
+      moveItem('toPack', 'toBuy', id);
+    },
+    [moveItem],
+  );
+
+  const handleDelete = useCallback(
+    (id: string) => {
+      removeItem('toPack', id);
+    },
+    [removeItem],
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.progressContainer}>
-        <Text style={styles.progressLabel}>
-          🎒 Packed {packedItems} / {totalItems} items
-        </Text>
-        <View style={styles.progressBarBackground}>
-          <View style={[styles.progressBarFill, { width: `${progress * 100}%` }]} />
+    <View style={styles.screen}>
+      <ScreenHeader />
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}>
+        {/* Hero */}
+        <View style={styles.hero}>
+          <BigSuitcase fill={fillRatio} size={80} />
+          <View style={styles.heroText}>
+            <Text style={styles.heroLabel}>PACKING</Text>
+            <View style={styles.heroCountRow}>
+              <Text style={styles.heroCount}>{packedItems}</Text>
+              <Text style={styles.heroTotal}>/ {totalItems}</Text>
+            </View>
+            <Text style={styles.heroSub}>
+              {remaining === 0
+                ? totalItems === 0
+                  ? 'Nothing added yet'
+                  : 'All packed!'
+                : `${remaining} item${remaining !== 1 ? 's' : ''} left`}
+            </Text>
+          </View>
         </View>
-      </View>
 
-      <AddPackingItemInput onAdd={handleAdd} />
+        {/* Add input */}
+        <View style={styles.inputWrapper}>
+          <AddPackingItemInput onAdd={handleAdd} />
+        </View>
 
-      <FlatList
-        data={sortedToPack}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.list}
-      />
+        {/* Category groups */}
+        {orderedCategories.map((cat) => (
+          <CategoryCard
+            key={cat}
+            category={cat}
+            items={grouped[cat] ?? []}
+            onToggle={togglePacked}
+            onMoveToBuy={handleMoveToBuy}
+            onDelete={handleDelete}
+          />
+        ))}
+
+        {totalItems === 0 && (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyText}>Add your first item above</Text>
+          </View>
+        )}
+
+        <View style={{ height: 24 }} />
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  heading: { fontSize: 22, fontWeight: 'bold', marginBottom: 12 },
-  list: { gap: 12 },
-  progressContainer: {
-    marginBottom: 16,
+  screen: {
+    flex: 1,
+    backgroundColor: COLORS.paper,
   },
-  progressLabel: {
-    fontSize: 14,
-    marginBottom: 6,
-    fontWeight: '500',
-    color: COLORS.text,
+  scroll: {
+    flex: 1,
   },
-  progressBarBackground: {
-    height: 10,
-    backgroundColor: COLORS.neutral300,
-    borderRadius: 6,
+  content: {
+    padding: 20,
+    paddingTop: 0,
+    gap: 12,
+  },
+
+  // Hero
+  hero: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    padding: 18,
+    paddingHorizontal: 20,
+    borderRadius: 24,
+    backgroundColor: COLORS.tealPale,
+    borderWidth: 1,
+    borderColor: COLORS.lineSoft,
+  },
+  heroText: {
+    flex: 1,
+  },
+  heroLabel: {
+    fontSize: 10,
+    color: COLORS.teal,
+    letterSpacing: 1.3,
+    fontWeight: '600',
+  },
+  heroCountRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 4,
+    marginTop: 2,
+  },
+  heroCount: {
+    fontSize: 38,
+    color: COLORS.ink,
+    lineHeight: 40,
+    fontWeight: '300',
+    letterSpacing: -1,
+  },
+  heroTotal: {
+    fontSize: 20,
+    color: COLORS.ink3,
+    fontWeight: '400',
+  },
+  heroSub: {
+    fontSize: 12.5,
+    color: COLORS.ink3,
+    marginTop: 4,
+  },
+
+  // Input
+  inputWrapper: {},
+
+  // Category card
+  card: {
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: COLORS.line,
     overflow: 'hidden',
   },
-  progressBarFill: {
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 14,
+    paddingHorizontal: 16,
+  },
+  glyphBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  cardMeta: {
+    flex: 1,
+    minWidth: 0,
+  },
+  cardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  cardTitle: {
+    fontSize: 14.5,
+    fontWeight: '600',
+    color: COLORS.ink,
+    letterSpacing: -0.1,
+  },
+  doneBadge: {
+    backgroundColor: COLORS.leafSoft,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 5,
+  },
+  doneBadgeText: {
+    fontSize: 9,
+    color: COLORS.leaf,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+  },
+  progressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 5,
+  },
+  progressBg: {
+    flex: 1,
+    height: 4,
+    borderRadius: 3,
+    backgroundColor: 'rgba(18,40,58,0.08)',
+    overflow: 'hidden',
+  },
+  progressFill: {
     height: '100%',
-    backgroundColor: COLORS.primary,
+    borderRadius: 3,
+  },
+  progressCount: {
+    fontSize: 11,
+    color: COLORS.ink3,
+    fontWeight: '500',
+  },
+
+  // Card body
+  cardBody: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(18,40,58,0.06)',
+    backgroundColor: '#fff',
+    paddingVertical: 6,
+    paddingHorizontal: 6,
+  },
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 7,
+    borderWidth: 1.5,
+    borderColor: COLORS.mute,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  checkboxPacked: {
+    backgroundColor: COLORS.teal,
+    borderColor: COLORS.teal,
+  },
+  itemName: {
+    flex: 1,
+    fontSize: 13.5,
+    fontWeight: '500',
+    color: COLORS.ink,
+  },
+  itemNamePacked: {
+    textDecorationLine: 'line-through',
+    color: COLORS.mute,
+    fontWeight: '400',
+  },
+  itemActions: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  actionChip: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  // Empty
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 32,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: COLORS.mute,
   },
 });

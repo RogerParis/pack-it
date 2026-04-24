@@ -39,8 +39,6 @@ export default function SuggestionsListHeader({ onGenerate }: Props) {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={styles.container}>
-      <Text style={styles.heading}>🤖 AI Suggestions</Text>
-
       <TextInput
         placeholder="Destination"
         value={location}
@@ -104,7 +102,6 @@ export default function SuggestionsListHeader({ onGenerate }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
-  heading: { fontSize: 22, fontWeight: 'bold', marginBottom: 12 },
   subheading: { marginTop: 16, fontWeight: 'bold' },
   input: {
     borderWidth: 1,

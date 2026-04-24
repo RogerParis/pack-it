@@ -1,40 +1,28 @@
-import { TouchableOpacity } from 'react-native';
-
-import { Tabs, useRouter } from 'expo-router';
+import { Tabs } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 
-import { useAuthStore } from '@/store/authStore';
-import { usePackingStore } from '@/store/packingStore';
 import { COLORS } from '@/theme/colors';
 
 export default function TabLayout() {
-  const router = useRouter();
-  const user = useAuthStore((state) => state.user);
-  const activeListName = usePackingStore((state) => {
-    const activeList = state.activeList;
-    return activeList ? state.lists[activeList].name : 'Default List';
-  });
   return (
     <Tabs
       screenOptions={{
-        headerLeft: () => (
-          <TouchableOpacity
-            onPress={() => router.push('/(donate)')}
-            style={{ marginLeft: 16 }}
-            activeOpacity={0.5}>
-            <Feather name="coffee" size={24} color={COLORS.primary} />
-          </TouchableOpacity>
-        ),
-        headerRight: () => (
-          <TouchableOpacity
-            onPress={() => router.push('/(profile)')}
-            style={{ marginRight: 16 }}
-            activeOpacity={0.5}>
-            <Feather name={user ? 'user' : 'log-in'} size={28} color={COLORS.primary} />
-          </TouchableOpacity>
-        ),
-        headerShown: true,
-        headerTitle: activeListName,
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: COLORS.paper,
+          borderTopColor: COLORS.line,
+          borderTopWidth: 1,
+          height: 64,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarActiveTintColor: COLORS.teal,
+        tabBarInactiveTintColor: COLORS.mute,
+        tabBarLabelStyle: {
+          fontSize: 10.5,
+          fontWeight: '600',
+          letterSpacing: 0.1,
+        },
       }}>
       <Tabs.Screen
         name="to-pack"
