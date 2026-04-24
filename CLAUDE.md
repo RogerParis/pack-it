@@ -15,6 +15,20 @@ yarn test:coverage  # Jest with coverage
 yarn tsc --noEmit   # Type-check only (used in CI)
 ```
 
+## Native Setup (CNG)
+
+The `ios/` and `android/` folders are **not committed** (CNG workflow). Regenerate them after cloning or after SDK upgrades:
+
+```bash
+yarn install                # installs deps and applies patches (patch-package)
+npx expo prebuild --clean   # generates ios/ and android/ from app.config.ts
+```
+
+All native customisations live in:
+- `app.config.ts` plugins array
+- `plugins/` — local config plugins (e.g. `withFirebaseSwiftFix.js`)
+- `patches/` — patch-package patches applied on `yarn install`
+
 ## Architecture
 
 Expo React Native app (New Architecture enabled) with file-based routing via Expo Router.

@@ -1,4 +1,4 @@
-import { MMKV } from 'react-native-mmkv';
+import { createMMKV } from 'react-native-mmkv';
 
 import { ListType, PackingItem, PackingListDataRecord } from '../types/packing';
 
@@ -7,7 +7,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
-const storage = new MMKV();
+const storage = createMMKV();
 
 type PackingState = {
   lists: PackingListDataRecord;
@@ -172,7 +172,7 @@ export const usePackingStore = create<PackingState>()(
       storage: createJSONStorage(() => ({
         getItem: (key) => storage.getString(key) ?? null,
         setItem: storage.set.bind(storage),
-        removeItem: storage.delete.bind(storage),
+        removeItem: storage.remove.bind(storage),
       })),
     },
   ),
