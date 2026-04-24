@@ -4,8 +4,10 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 
 import AddPackingItemInput from '@/components/add_packing_item_input.component';
+import CategoryPicker from '@/components/category_picker.component';
 import PackingListItem from '@/components/packing_list_item.component';
 import ScreenHeader from '@/components/screen_header.component';
+import { useCategoryPicker } from '@/utils/use_category_picker';
 
 import { showDuplicateItemAlert, showMoveItemAlert } from '@/services/alerts.service';
 import { usePackingStore } from '@/store/packingStore';
@@ -14,7 +16,7 @@ import { PackingItem } from '@/types/packing';
 import { v4 as uuid } from 'uuid';
 
 export default function ToBuyScreen() {
-  const { addItem, removeItem, moveItem } = usePackingStore();
+  const { addItem, removeItem, moveItem, togglePacked } = usePackingStore();
 
   const toBuy = usePackingStore((state) => {
     const activeList = state.activeList;
@@ -27,6 +29,20 @@ export default function ToBuyScreen() {
 
   const bought = toBuy.filter((i) => i.packed).length;
   const total = toBuy.length;
+
+  const {
+    selectedCategory,
+    setSelectedCategory,
+    showCustomInput,
+    setShowCustomInput,
+    customInput,
+    setCustomInput,
+    customInputRef,
+    displayCategories,
+    confirmCustomCategory,
+    effectiveCategory,
+    afterItemAdded,
+  } = useCategoryPicker(toBuy);
 
   const handleAdd = useCallback(
     (name: string) => {
@@ -52,22 +68,24 @@ export default function ToBuyScreen() {
         id: uuid(),
         name,
         packed: false,
-        category: '',
+        category: effectiveCategory,
       };
       addItem('toBuy', newItem);
+      afterItemAdded();
     },
-    [addItem, removeItem, toBuy, toPack],
+    [addItem, removeItem, toBuy, toPack, effectiveCategory, afterItemAdded],
   );
 
   const renderItem = useCallback(
     ({ item }: { item: PackingItem }) => (
       <PackingListItem
         item={item}
+        onPress={() => togglePacked('toBuy', item.id)}
         onDelete={() => removeItem('toBuy', item.id)}
         onMoveToPack={() => moveItem('toBuy', 'toPack', item.id)}
       />
     ),
-    [removeItem, moveItem],
+    [togglePacked, removeItem, moveItem],
   );
 
   return (
@@ -103,6 +121,26 @@ export default function ToBuyScreen() {
               onAdd={handleAdd}
               placeholder="Add something to buy…"
               accentColor={COLORS.coral}
+            />
+
+            {/* Category picker */}
+            <CategoryPicker
+              displayCategories={displayCategories}
+              selectedCategory={selectedCategory}
+              onSelectCategory={(cat) => {
+                setSelectedCategory(cat);
+                setShowCustomInput(false);
+              }}
+              showCustomInput={showCustomInput}
+              customInput={customInput}
+              customInputRef={customInputRef}
+              onCustomInputChange={setCustomInput}
+              onConfirmCustom={confirmCustomCategory}
+              onOpenCustom={() => setShowCustomInput(true)}
+              onCancelCustom={() => {
+                setShowCustomInput(false);
+                setCustomInput('');
+              }}
             />
           </View>
         }

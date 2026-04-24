@@ -19,7 +19,7 @@ type PackingState = {
   setActiveList: (name: string) => void;
   mergeList: (sourceId: string) => void;
   addItem: (type: ListType, item: PackingItem) => void;
-  togglePacked: (id: string) => void;
+  togglePacked: (listType: ListType, id: string) => void;
   moveItem: (fromList: ListType, toList: ListType, id: string) => void;
   removeItem: (type: ListType, id: string) => void;
   clearList: (type: ListType) => void;
@@ -80,10 +80,10 @@ export const usePackingStore = create<PackingState>()(
         });
       },
 
-      togglePacked: (id) => {
+      togglePacked: (listType, id) => {
         set((state) => {
           if (state.activeList) {
-            const item = state.lists[state.activeList].toPack.find((i) => i.id === id);
+            const item = state.lists[state.activeList][listType].find((i) => i.id === id);
             if (item) {
               item.packed = !item.packed;
             }

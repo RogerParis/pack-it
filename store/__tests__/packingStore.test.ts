@@ -49,14 +49,14 @@ describe('removeItem', () => {
 describe('togglePacked', () => {
   it('marks an unpacked item as packed', () => {
     usePackingStore.getState().addItem('toPack', item('1', 'Passport'));
-    usePackingStore.getState().togglePacked('1');
+    usePackingStore.getState().togglePacked('toPack', '1');
     const { lists, activeList } = usePackingStore.getState();
     expect(lists[activeList!].toPack[0].packed).toBe(true);
   });
 
   it('marks a packed item as unpacked', () => {
     usePackingStore.getState().addItem('toPack', { ...item('1', 'Passport'), packed: true });
-    usePackingStore.getState().togglePacked('1');
+    usePackingStore.getState().togglePacked('toPack', '1');
     const { lists, activeList } = usePackingStore.getState();
     expect(lists[activeList!].toPack[0].packed).toBe(false);
   });
