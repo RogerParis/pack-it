@@ -27,7 +27,7 @@ export const getUserPackingData = async (uid: string): Promise<CloudPackingData 
   const docRef = doc(collection(firestore, 'users'), uid);
   const docSnap = await getDoc(docRef);
 
-  if (docSnap.exists) {
+  if (docSnap.exists()) {
     return docSnap.data() as CloudPackingData;
   }
 

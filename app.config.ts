@@ -18,6 +18,7 @@ export default {
     ios: {
       supportsTablet: true,
       bundleIdentifier: 'com.rogerparis.packit',
+      googleServicesFile: './GoogleService-Info.plist',
     },
     android: {
       adaptiveIcon: {
@@ -25,11 +26,18 @@ export default {
         backgroundColor: '#ffffff',
       },
       package: 'com.rogerparis.packit',
+      googleServicesFile: './google-services.json',
     },
     web: {
       favicon: './assets/favicon.png',
     },
-    plugins: ['@react-native-firebase/app', '@react-native-firebase/auth'],
+    plugins: [
+      '@react-native-firebase/app',
+      '@react-native-firebase/auth',
+      '@react-native-community/datetimepicker',
+      'expo-router',
+      './plugins/withFirebaseSwiftFix',
+    ],
     extra: {
       OPEN_WEATHER_API_KEY: process.env.OPEN_WEATHER_API_KEY,
       OPENAI_API_KEY: process.env.OPENAI_API_KEY,
